@@ -1,5 +1,8 @@
+.project
+target
+.classpath
+.settings
 *.class
-
 # Package Files #
 *.jar
 *.war
