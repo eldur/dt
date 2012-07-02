@@ -1,0 +1,9 @@
+<table class="table table-bordered">
+ <thead>
+    <tr>
+      <th collspan="3">${report.label}</th>
+      
+    </tr>
+  </thead>
+ 
+</table>
