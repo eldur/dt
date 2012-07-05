@@ -1,9 +1,13 @@
 package info.dt.srv;
 
+import info.dt.data.IDateConfig;
+
 import java.net.InetSocketAddress;
+import java.net.URL;
 
 import org.junit.Test;
 
+import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -20,6 +24,10 @@ public class AppServerTest {
       protected void configure() {
         InetSocketAddress srvSocket = InetSocketAddress.createUnresolved("localhost", 9999);
         bind(InetSocketAddress.class).toInstance(srvSocket);
+        bind(IJsonSerializer.class).to(JsonSeri.class);
+
+        URL workFile = Resources.getResource("test.yaml");
+        bind(IDateConfig.class).toInstance(new YamlDateConfig(workFile));
       }
 
     };

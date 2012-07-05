@@ -31,7 +31,8 @@ public class AppServer extends Server {
     webapp.addEventListener(new InjeciveServletConfig(injector));
 
     webapp.addServlet(new ServletHolder(new JspServlet()), "/");
-    webapp.addServlet(new ServletHolder(new WebSocketServlet()), "/ws/");
+    WebSocketServlet webSocketServlet = injector.getInstance(WebSocketServlet.class);
+    webapp.addServlet(new ServletHolder(webSocketServlet), "/ws/");
     setHandler(webapp);
 
   }

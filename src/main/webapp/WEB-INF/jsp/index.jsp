@@ -85,7 +85,7 @@
         
         onMessage: function(m) {
           if (m.data){
-        	  $('info').innerHTML= "Msg: "+ m.data; 
+        	  $('info').innerHTML = m.data; 
           }
         },
         
