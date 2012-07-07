@@ -49,5 +49,9 @@ public class TimeSheetPosition {
   public String getMainLabel() {
     return labels.get(0);
   }
+  
+  public String getTitle() {
+    return "Title";
+  }
 
 }

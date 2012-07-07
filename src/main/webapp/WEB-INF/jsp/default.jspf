@@ -1,9 +1,98 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <table class="table table-bordered">
  <thead>
     <tr>
       <th collspan="3">${report.label}</th>
-      
     </tr>
   </thead>
- 
+        <tr style="background-color: #F5F5F5" id="template" class="hidden">
+          <td class="mainRow" width="50%" rowspan="2"><p><span class="mainLabel label">LABEL-0</span></p>
+           <span class="title">Title</span><br />
+           <i><small style="font-size: 10pt;">- descriptionline</small></i><br />
+           <i><small style="font-size: 10pt;">- descriptionline</small></i><br />
+          </td>
+          
+          <td width="30%" class="groupLabelText">Σ</td>
+          <td width="20%" >
+             <div class="progress progress-striped">
+               <div class="bar mainPercentage" style="width: 100%;"></div>
+             </div>
+          </td>
+          <td><small class="mainDuration">10h&nbsp;15m</small></td>
+        </tr>
+      
+        <tr id="subTemplate" class="hidden">
+        <td class="subLabel"> sub label </td>
+        <td><div class="progress progress-striped progress-inverse">
+  <div class="bar subPercentage" style="width:45%"></div>
+</div></td><td><small class="subDuration">3h&nbsp;45m</small></td>
+        </tr>
+        <!-- /c:forEach>  -->
+
 </table>
+<script src="/assets/bootstrap/js/bootstrap.js"></script>
+
+    <script type='text/javascript'>
+    
+      if (!window.WebSocket)
+        alert("WebSockets are not supported by this browser");
+      
+      var reports = {
+    		  connect: function(name) {
+          this.name = name;
+          var location = document.location.toString().replace('http://','ws://').replace('https://','wss://');
+          this.ws = new WebSocket("ws://${srvSocket}/ws/");
+          this.ws.onopen = this.onOpen;
+          this.ws.onmessage = this.onMessage;
+          this.ws.onclose = this.onClose;
+        },
+        
+        onOpen: function(){
+          $('#info').text('c');
+        },
+        
+        send: function(message){
+          if (this.ws)
+            this.ws.send(message);
+        },
+        
+        onMessage: function(m) {
+          if (m.data){
+        	 
+        	  $('.table tr.copy').each(function() {
+        		  $(this).remove();
+        	  } );
+        	  $.each($.parseJSON(m.data), function(i, field) {
+        				console.log(field.sub);
+           		  var main = $('#template').clone().attr('id', 'x').addClass("copy");
+           		  $(".mainLabel", main).text(field.label);
+           		  $(".title", main).text(field.title);
+           		  $(".mainDuration", main).text(field.duration);
+           	  	$(".mainRow", main).attr("rowspan", 2);
+           		  main.removeClass("hidden");
+           		  main.appendTo('.table');
+           		  
+              	var sub = $('#subTemplate').clone().attr('id', 'x').addClass("copy");
+              	sub.removeClass("hidden");
+              	sub.appendTo('.table');
+        	       
+       
+        
+        	  });
+        	  
+          }
+        },
+        
+        onClose: function(m) {
+          this.ws = null;
+          $('#info').text('off');
+        }
+        
+      };
+      reports.connect("${reportID}");
+      
+    </script>
