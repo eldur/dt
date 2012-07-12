@@ -1,5 +1,9 @@
 package info.dt.report;
 
+import info.dt.data.TimeSheet;
+
+import java.util.List;
+
 public interface IReportView {
 
   String getLabel();
@@ -11,5 +15,7 @@ public interface IReportView {
   String getNext();
 
   String getPrevious();
+
+  List<IReportPosition> toReportPositions(TimeSheet timeSheet);
 
 }

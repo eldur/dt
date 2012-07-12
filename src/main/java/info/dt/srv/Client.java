@@ -4,10 +4,14 @@ import info.dt.data.IDateConfig;
 import info.dt.data.TimeSheet;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.eclipse.jetty.websocket.WebSocket;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 
 class Client extends Thread implements WebSocket.OnTextMessage {
 
@@ -19,6 +23,8 @@ class Client extends Thread implements WebSocket.OnTextMessage {
 
   private Connection connection = null;
 
+  private Set<String> idsOnClient = Sets.newHashSet();
+
   public void onOpen(Connection connection) {
     this.connection = connection;
     start();
@@ -26,10 +32,12 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   }
 
   protected void send(String string) {
-    try {
-      connection.sendMessage(string);
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
+    if (string.length() > 0) {
+      try {
+        connection.sendMessage(string);
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
     }
   }
 
@@ -37,7 +45,7 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   public void run() {
     while (!isInterrupted()) {
       TimeSheet timeSheet = iDateConfig.getTimeSheet(2012, 06);
-      send(serializer.toJson(timeSheet));
+      send(serializer.toJson(timeSheet, idsOnClient));
       try {
         synchronized (this) {
           wait(2000);
@@ -54,7 +62,8 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   }
 
   public void onMessage(String arg0) {
-    // TODO Auto-generated method stub
+    Iterable<String> split = Splitter.on(",").split(arg0);
+    idsOnClient = Sets.newHashSet(split);
 
   }
 

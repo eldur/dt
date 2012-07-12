@@ -10,9 +10,9 @@ import org.joda.time.Duration;
 import com.google.common.collect.ImmutableList;
 
 @Data
-public class TimeSheetPosition {
+public class TimeSheetPosition implements ITimeSheetPosition {
 
-  private final List<String> labels;
+  private final List<String> path;
   private final String comment;
   private final Duration duration;
   private final DateTime begin;
@@ -23,35 +23,43 @@ public class TimeSheetPosition {
   }
 
   public TimeSheetPosition(DateTime begin, String comment, long minutes,
-      Iterable<String> labels) {
-    labels.getClass();
-    comment.getClass();
-    this.labels = ImmutableList.copyOf(labels);
-    if (this.labels.size() <= 0) {
-      throw new IllegalStateException("no labels found");
-    }
-    this.comment = comment;
-    this.duration = Duration.standardMinutes(minutes);
-    this.begin = begin;
+      Iterable<String> path) {
+    this(begin, comment,  Duration.standardMinutes(minutes), path);
   }
-
-  public TimeSheetPosition(DateTime begin, String label, String comment,
-      Duration duration) {
-    label.getClass();
+  
+  public TimeSheetPosition(DateTime begin, String comment, Duration duration,
+      Iterable<String> path) {
+    path.getClass();
     comment.getClass();
-    duration.getClass();
-    this.labels = ImmutableList.of(label);
+    this.path = ImmutableList.copyOf(path);
+    if (this.path.size() <= 0) {
+      throw new IllegalStateException("the first path element is required");
+    }
     this.comment = comment;
     this.duration = duration;
     this.begin = begin;
   }
 
-  public String getMainLabel() {
-    return labels.get(0);
+  public TimeSheetPosition(DateTime begin, String id, String comment,
+      Duration duration) {
+    id.getClass();
+    comment.getClass();
+    duration.getClass();
+    this.path = ImmutableList.of(id);
+    this.comment = comment;
+    this.duration = duration;
+    this.begin = begin;
   }
-  
+  /**
+   * 
+   * @return first path element
+   */
+  public String getId() {
+    return path.get(0);
+  }
+   
   public String getTitle() {
-    return "Title";
+    return " a very long title description is sometimes a regular casee, because it's a story title";
   }
 
 }

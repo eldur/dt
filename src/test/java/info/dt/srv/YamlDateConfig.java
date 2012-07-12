@@ -22,6 +22,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.yaml.snakeyaml.Yaml;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -73,8 +74,7 @@ public class YamlDateConfig implements IDateConfig {
           for (Map<String, ?> pos : entry.getValue()) {
             // pos
             DateTime begin = null;
-            String label = null;
-            List<String> labels = null;
+            List<String> path = null;
             String description = null;
             Duration duration = null;
             for (Entry<String, ?> o : pos.entrySet()) {
@@ -99,9 +99,9 @@ public class YamlDateConfig implements IDateConfig {
               } else if ("l".equals(key)) {
                 Object value = o.getValue();
                 if (value instanceof String) {
-                  label = (String) value;
-                } else if (value instanceof List<?>) {
-                  labels = (List<String>) value;
+                  String pathString = (String) value;
+                  Iterable<String> iterable = Splitter.on("+").split(pathString);
+                  path = Lists.newLinkedList(iterable);
                 } else {
                   throw new IllegalStateException("unknown type for l");
                 }
@@ -111,11 +111,8 @@ public class YamlDateConfig implements IDateConfig {
               }
             }
             TimeSheetPosition timeSheetPosition;
-            if (label != null) {
-
-              timeSheetPosition = new TimeSheetPosition(begin, label, description, duration);
-            } else if (labels != null) {
-              timeSheetPosition = new TimeSheetPosition(begin, description, duration.getStandardMinutes(), labels);
+            if (path != null) {
+              timeSheetPosition = new TimeSheetPosition(begin, description, duration.getStandardMinutes(), path);
             } else {
               throw new IllegalStateException("no label was set");
             }

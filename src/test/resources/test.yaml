@@ -1,5 +1,6 @@
 2012-06-01:
-- {t: "1030-1100", l: "Fruit Dealer 1", d: "phonecall"}
-- {t: "11-12", l: "Fruit Dealer 2", d: "sell apple"}
+- {t: "1030-1115", l: "Food Dealer 1", d: "phonecall"}
+- {t: "1130-12", l: "Fruit Dealer 2", d: "sell an apple"}
 2012-06-02:
-- {t: "1030-1100", l: ["stock", "misc"], d: "check stock market"}
+- {t: "1030-1100", l: "001+stock+xy", d: "check stock market"}
+- {t: "11-1200", l: "001+meeting+xy", d: "check stock market; meeting"}
