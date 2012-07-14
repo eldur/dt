@@ -1,7 +1,11 @@
 package info.dt.report;
 
+import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertEquals;
+import info.dt.data.ITimeSheetPosition;
 import info.dt.data.TimeSheetPosition;
+
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -16,21 +20,24 @@ public class TicketFilterBuilderTest {
 
     TicketFilterBuilder tfb = new TicketFilterBuilder(null).setSeparator('#');
 
-    assertTFB(tfb, "Important changes; discussion" //
+    assertTFB(tfb, of("Important changes; discussion") //
         , "Important changes; discussion");
-    assertTFB(tfb, "Important changes; maic things" //
-        , "Important changes;\ndiscussion\nmaic things");
-    assertTFB(tfb, "Importat hanges; maic things" //
-        , "Important changes;\ndiscussion\nmaic things\nImportat hanges; maic things");
+    assertTFB(tfb, of("Important changes;", "discussion", "maic things"), "Important changes; maic things" //
+    );
+    assertTFB(tfb, of("Important changes;", "discussion", "maic things", "Importat hanges; maic things"),
+        "Importat hanges; maic things" //
+    );
 
     tfb = new TicketFilterBuilder(null);
 
-    assertTFB(tfb, "Important changes; discussion" //
-        , "Important changes\ndiscussion");
-    assertTFB(tfb, "Important changes; maic things" //
-        , "Important changes\ndiscussion\nmaic things");
-    assertTFB(tfb, "Importat hanges; maic things;other things" //
-        , "Important changes\ndiscussion\nmaic things\nImportat hanges\nmaic things\nother things");
+    assertTFB(tfb, of("Important changes", "discussion"), "Important changes; discussion" //
+    );
+    assertTFB(tfb, of("Important changes", "discussion", "maic things"), "Important changes; maic things" //
+    );
+    assertTFB(tfb,
+        of("Important changes", "discussion", "maic things", "Importat hanges", "maic things", "other things"),
+        "Importat hanges; maic things;other things" //
+    );
   }
 
   // @Test
@@ -46,11 +53,11 @@ public class TicketFilterBuilderTest {
   // , "Important changes\ndiscussion\nNonImportat changes\nother things");
   // }
 
-  protected void assertTFB(TicketFilterBuilder tfb, String comment, String expected) {
+  protected void assertTFB(TicketFilterBuilder tfb, List<String> expected, String comment) {
     DateTime begin = DateTime.now();
     Duration duration = Duration.ZERO;
     Iterable<String> path = ImmutableList.of("001", "abc");
-    TimeSheetPosition pos1 = new TimeSheetPosition(begin, comment, duration, path);
+    ITimeSheetPosition pos1 = new TimeSheetPosition(begin, comment, duration, path);
     assertEquals(expected, tfb.concatDescription(pos1));
   }
 

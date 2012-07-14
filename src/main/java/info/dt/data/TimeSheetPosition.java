@@ -57,9 +57,5 @@ public class TimeSheetPosition implements ITimeSheetPosition {
   public String getId() {
     return path.get(0);
   }
-   
-  public String getTitle() {
-    return " a very long title description is sometimes a regular casee, because it's a story title";
-  }
 
 }

@@ -9,8 +9,6 @@ public interface ITimeSheetPosition {
 
   String getId();
 
-  String getTitle();
-
   Duration getDuration();
 
   List<String> getPath();

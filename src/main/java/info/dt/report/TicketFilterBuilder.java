@@ -1,5 +1,6 @@
 package info.dt.report;
 
+import info.dt.data.ITimeSheetPosition;
 import info.dt.data.TimeSheetPosition;
 
 import java.util.Collection;
@@ -21,7 +22,7 @@ import com.google.common.collect.Multimap;
 @Slf4j
 public class TicketFilterBuilder {
 
-  private final List<TimeSheetPosition> positions = Lists.newArrayList();
+  private final List<IReportPosition> positions = Lists.newArrayList();
 
   private final Iterable<TimeSheetPosition> t;
   private boolean noDescription = false;
@@ -39,40 +40,33 @@ public class TicketFilterBuilder {
     return true; // do not filter
   }
 
-  /**
-   * 
-   * TODO return IReportPosition
-   */
-  public List<TimeSheetPosition> getResult() {
-    Multimap<String, TimeSheetPosition> ticketSum = ArrayListMultimap.create();
+  public List<IReportPosition> getResult() {
+
+    Multimap<String, IReportPosition> ticketSum = ArrayListMultimap.create();
     for (TimeSheetPosition pos : t) {
       if (filter(pos)) {
-        ticketSum.put(pos.getId(), pos);
+        ticketSum
+            .put(pos.getId(), new ReportPosition(pos.getBegin(), "", pos.getComment(), pos.getDuration(), pos.getPath()));
       }
     }
-    for (Entry<String, Collection<TimeSheetPosition>> entry : ticketSum.asMap().entrySet()) {
+    for (Entry<String, Collection<IReportPosition>> entry : ticketSum.asMap().entrySet()) {
       Duration sum = new Duration(0);
       String description = "";
-      String activity = "";
-      for (TimeSheetPosition pos : entry.getValue()) {
+
+      for (IReportPosition pos : entry.getValue()) {
         sum = sum.plus(pos.getDuration());
         description = getDescription(pos);
-        activity = getActivity(pos);
       }
 
       if (noDescription) {
         description = "";
       }
-      positions.add(new TimeSheetPosition(DateTime.now(), activity, description, sum));
+      positions.add(new ReportPosition(DateTime.now(), "", description, sum, null));
     }
     return positions;
   }
 
-  protected String getActivity(TimeSheetPosition pos) {
-    return pos.getId();
-  }
-
-  protected String getDescription(TimeSheetPosition pos) {
+  protected String getDescription(IReportPosition pos) {
     return pos.getComment();
   }
 
@@ -80,7 +74,7 @@ public class TicketFilterBuilder {
 
   private char separatorChar = ';';
 
-  protected String concatDescription(TimeSheetPosition pos) {
+  protected List<String> concatDescription(ITimeSheetPosition pos) {
 
     String desc = pos.getComment();
     String id = pos.getId();
@@ -126,28 +120,24 @@ public class TicketFilterBuilder {
     }
     String titleString = title.toString();
     titleString = titleString.replace(separatorChar, '\n').replaceAll("\n.*", "");
-    String partsOf = "";
+    List<String> result = Lists.newArrayList();
+    result.add(titleString.trim());
     if (lines.size() > 0) {
-      StringBuilder parts = new StringBuilder();
       Collections.sort(lines);
       for (String line : lines) {
         String replaceFirst = line.replaceFirst("^" + titleString, "");
         for (String s : Splitter.on(separatorChar).split(replaceFirst)) {
-          parts.append(s.trim()).append("\n");
+          String trim = s.trim();
+          if (trim.length() > 0) {
+            result.add(trim);
+          }
         }
 
-        parts.trimToSize();
       }
-      partsOf = parts.toString();
 
-      partsOf = partsOf.substring(0, partsOf.length() - 1);
-    }
-    if (partsOf.length() > 0) {
-      partsOf = "\n" + partsOf;
     }
 
-    return (titleString.trim() + partsOf).replaceAll("[\n]{2}", "\n");
-
+    return result;
   }
 
   public TicketFilterBuilder setSeparator(char separatorChar) {

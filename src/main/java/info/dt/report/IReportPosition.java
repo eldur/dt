@@ -6,4 +6,6 @@ public interface IReportPosition extends ITimeSheetPosition {
 
   String getLabel();
 
+  String getTitle();
+
 }
