@@ -21,14 +21,14 @@
                <div class="bar mainPercentage" style="width: 100%;"></div>
              </div>
           </td>
-          <td><small class="mainDuration"></small></td>
+          <td nowrap="nowrap"><small class="mainDuration"></small></td>
         </tr>
       
         <tr id="subTemplate" class="hidden">
-        <td class="subLabel"> sub label </td>
-        <td><div class="progress progress-striped progress-inverse">
-  <div class="bar subPercentage" style="width:45%"></div>
-</div></td><td><small class="subDuration">3h&nbsp;45m</small></td>
+        <td class="subLabel"></td>
+        <td><div class="progress-gray progress progress-striped progress-inverse">
+  <div class="bar subPercentage" style="width:0%"></div>
+</div></td><td nowrap="nowrap"><small class="subDuration"></small></td>
         </tr>
         <!-- /c:forEach>  -->
 
@@ -68,21 +68,26 @@
         	  $.each($.parseJSON(m.data), function(i, field) {
            		  var main = $('#template').clone().attr('id', field.htmlid).addClass("copy");
            		  $(".mainLabel", main).text(field.id);
-           		  $(".groupLabelText", main).text(field.label);
+           		  $(".groupLabelText", main).text(field.path);
            		  $(".title", main).text(field.title);
            		  $(".comment", main).text(field.comment);
            		  $(".mainDuration", main).text(field.duration);
+           		  $(".mainPercentage", main).css('width', field.durationPercentage + '%');
            	  	var subLabel = $(field.sub);
+           	 
            		  main.removeClass("hidden");
            		  main.appendTo('.table');
            			if (subLabel.length > 1) {
            		  $(".mainRow", main).attr("rowspan", subLabel.length + 1);
            		  $.each(subLabel, function(i, field) {
-           		
-              	var sub = $('#subTemplate').clone().attr('id', 'x').addClass("copy");
-              	sub.removeClass("hidden");
-              	sub.appendTo('.table');
-           		});
+           			
+              		var sub = $('#subTemplate').clone().attr('id',  field.htmlid).addClass("copy");
+              		$(".subDuration", sub).text(field.duration);
+              		$(".subPercentage", sub).css('width', field.durationPercentage + '%');
+              		$(".subLabel", sub).text(field.path);
+              		sub.removeClass("hidden");
+              		sub.appendTo('.table');
+           			});
            			} else {
            				$(".mainRow", main).attr("rowspan", 1);
            			}

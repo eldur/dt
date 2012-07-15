@@ -6,6 +6,7 @@ import info.dt.data.TimeSheetPosition;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +17,11 @@ import org.joda.time.Duration;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.mycila.inject.internal.guava.base.Joiner;
+import com.mycila.inject.internal.guava.collect.Maps;
 
 @Slf4j
 public class TicketFilterBuilder {
@@ -41,33 +45,52 @@ public class TicketFilterBuilder {
   }
 
   public List<IReportPosition> getResult() {
-
-    Multimap<String, IReportPosition> ticketSum = ArrayListMultimap.create();
+    Duration sumOfReport = Duration.ZERO;
+    Multimap<String, ITimeSheetPosition> ticketSum = ArrayListMultimap.create();
     for (TimeSheetPosition pos : t) {
       if (filter(pos)) {
-        ticketSum
-            .put(pos.getId(), new ReportPosition(pos.getBegin(), "", pos.getComment(), pos.getDuration(), pos.getPath()));
+        Duration duration = pos.getDuration();
+        sumOfReport = sumOfReport.plus(duration);
+        ticketSum.put(pos.getId(), pos);
       }
     }
-    for (Entry<String, Collection<IReportPosition>> entry : ticketSum.asMap().entrySet()) {
-      Duration sum = new Duration(0);
-      String description = "";
 
-      for (IReportPosition pos : entry.getValue()) {
+    List<String> lastPath = ImmutableList.of();
+    for (Entry<String, Collection<ITimeSheetPosition>> entry : ticketSum.asMap().entrySet()) {
+      Duration sum = new Duration(0);
+      List<String> description = ImmutableList.of();
+      DateTime lastDate = null;
+      Map<List<String>, Duration> pathes = Maps.newHashMap();
+      for (ITimeSheetPosition pos : entry.getValue()) {
         sum = sum.plus(pos.getDuration());
-        description = getDescription(pos);
+        description = concatDescription(pos);
+        List<String> path = pos.getPath();
+        lastPath = path;
+        Duration duration = pathes.get(path);
+        lastDate = pos.getBegin();
+        if (duration == null) {
+          duration = pos.getDuration();
+        } else {
+          duration = duration.plus(pos.getDuration());
+        }
+        pathes.put(pos.getPath(), duration);
       }
 
       if (noDescription) {
-        description = "";
+        description = ImmutableList.of();
       }
-      positions.add(new ReportPosition(DateTime.now(), "", description, sum, null));
+
+      if (entry.getValue().size() != 1) {
+        lastPath = ImmutableList.of(entry.getKey());
+      }
+      positions.add(new ReportPosition(lastDate, formatList(description.subList(0, 1)), formatList(description.subList(
+          1, description.size())), sum, lastPath, pathes, sumOfReport));
     }
     return positions;
   }
 
-  protected String getDescription(IReportPosition pos) {
-    return pos.getComment();
+  private String formatList(List<String> subList) {
+    return Joiner.on("; ").join(subList); // TODO mv to serializer
   }
 
   private final Multimap<String, String> ticketDesc = HashMultimap.create();

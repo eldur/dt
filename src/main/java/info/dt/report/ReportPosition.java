@@ -2,32 +2,38 @@ package info.dt.report;
 
 import info.dt.data.TimeSheetPosition;
 
+import java.util.List;
+import java.util.Map;
+
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-
-import com.google.common.base.Joiner;
 
 class ReportPosition extends TimeSheetPosition implements IReportPosition {
 
   private String title;
+  private Map<List<String>, Duration> pathes;
+  private Duration reportDuration;
 
-  public ReportPosition(DateTime begin, String title, String comment, Duration duration, Iterable<String> path) {
-    super(begin, comment, duration, path);
-    this.title = title;
+  /**
+   * @return the pathes
+   */
+  public Map<List<String>, Duration> getPathes() {
+    return pathes;
   }
 
-  public String getLabel() {
-    String join = Joiner.on("-").join(getPath());
-    int length = getId().length();
-    if (join.length() > length) {
-      return join.substring(length + 1);
-    } else {
-      return "";
-    }
+  public ReportPosition(DateTime begin, String title, String comment //
+      , Duration duration, List<String> path, Map<List<String>, Duration> pathes, Duration reportDuration) {
+    super(begin, comment, duration, path);
+    this.title = title;
+    this.pathes = pathes;
+    this.reportDuration = reportDuration;
   }
 
   public String getTitle() {
     return title;
   }
 
+  public int getDurationPercentage() {
+    return (int) (100 * getDuration().getMillis() / reportDuration.getMillis());
+  }
 }

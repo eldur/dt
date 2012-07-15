@@ -40,7 +40,7 @@
   </div>
 </div>
 <div class="container" style="margin-top: 6em;">
-
+<p id="info">${report.info}</p>
 <br />
 <h4></h4>
 <div class="row">
@@ -49,9 +49,6 @@
   </div>
 </div>
 
-
-<br /><br />
-<p id="info">${report.info}</p>
 
 </div>
 </body>
