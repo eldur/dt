@@ -1,0 +1,20 @@
+{
+"name": "Δt - Reporting",
+"description": "Reporting ",
+"version": "1.0",
+"icons": {
+"128": "128.png"
+},
+"app": {
+"urls": [
+"http://localhost:9999/"
+],
+"launch": {
+"web_url": "http://localhost:9999/#launch"
+}
+},
+"permissions": [
+"unlimitedStorage",
+"notifications"
+]
+}
