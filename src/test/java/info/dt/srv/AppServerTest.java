@@ -7,6 +7,7 @@ import info.dt.report.IReportMapping;
 import java.net.InetSocketAddress;
 import java.net.URL;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.google.common.io.Resources;
@@ -26,7 +27,7 @@ public class AppServerTest {
       protected void configure() {
         InetSocketAddress srvSocket = InetSocketAddress.createUnresolved("localhost", 9999);
         bind(InetSocketAddress.class).toInstance(srvSocket);
-
+        bind(DateTime.class).toInstance(DateTime.parse("2012-06-24"));
         bind(IReportMapping.class).to(DefaultReportMapping.class);
         URL workFile = Resources.getResource("test.yaml");
         bind(IDateConfig.class).toInstance(new YamlDateConfig(workFile));

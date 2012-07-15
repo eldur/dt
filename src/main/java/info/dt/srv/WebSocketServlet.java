@@ -57,8 +57,9 @@ public class WebSocketServlet extends HttpServlet {
           });
           instance = childInjector.getInstance(Client.class);
         } catch (RuntimeException e) {
-          log.error("", e);
+          log.error("", e); // TODO
         }
+
         instance.getClass();
         return instance;
 

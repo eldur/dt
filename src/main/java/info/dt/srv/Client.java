@@ -2,6 +2,7 @@ package info.dt.srv;
 
 import info.dt.data.IDateConfig;
 import info.dt.data.TimeSheet;
+import info.dt.report.IReportView;
 
 import java.io.IOException;
 import java.util.Set;
@@ -9,6 +10,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.eclipse.jetty.websocket.WebSocket;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
@@ -20,6 +23,9 @@ class Client extends Thread implements WebSocket.OnTextMessage {
 
   @Inject
   private IDateConfig iDateConfig;
+
+  @Inject
+  private IReportView report;
 
   private Connection connection = null;
 
@@ -44,7 +50,9 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   @Override
   public void run() {
     while (!isInterrupted()) {
-      TimeSheet timeSheet = iDateConfig.getTimeSheet(2012, 06);
+      Interval currentInterval = report.getCurrentInterval();
+      DateTime start = currentInterval.getStart();
+      TimeSheet timeSheet = iDateConfig.getTimeSheet(start.getYear(), start.getMonthOfYear());
       send(serializer.toJson(timeSheet, idsOnClient));
       try {
         synchronized (this) {
