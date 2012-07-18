@@ -18,47 +18,56 @@ public class TicketFilterBuilderTest {
   @Test
   public void testConcatDescription() {
 
-    TicketFilterBuilder tfb = new TicketFilterBuilder(null).setSeparator('#');
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
 
-    assertTFB(tfb, of("Important changes; discussion") //
-        , "Important changes; discussion");
-    assertTFB(tfb, of("Important changes;", "discussion", "maic things"), "Important changes; maic things" //
+    assertTFB(tfb, of("Important (.changes)", "discussion"), "Important (.changes); discussion" //
     );
-    assertTFB(tfb, of("Important changes;", "discussion", "maic things", "Importat hanges; maic things"),
-        "Importat hanges; maic things" //
+    assertTFB(tfb, of("Important (.changes)", "discussion", "maic", "things"), "Important (.changes); maic ; things" //
     );
-
-    tfb = new TicketFilterBuilder(null);
-
-    assertTFB(tfb, of("Important changes", "discussion"), "Important changes; discussion" //
-    );
-    assertTFB(tfb, of("Important changes", "discussion", "maic things"), "Important changes; maic things" //
-    );
-    assertTFB(tfb,
-        of("Important changes", "discussion", "maic things", "Importat hanges", "maic things", "other things"),
-        "Importat hanges; maic things;other things" //
+    assertTFB(
+        tfb,
+        of("FIXME", "Important (.changes); discussion", "Important (.changes); maic ; things",
+            "Importat hanges; maic things;other things"), "Importat hanges; maic things;other things" //
     );
   }
 
-  // @Test
-  // public void testConcatDescriptionShuffel() {
-  //
-  // TicketFilterBuilder tfb = new TicketFilterBuilder(null);
-  //
-  // assertTFB(tfb, "NonImportant changes; discussion" //
-  // , "NonImportant changes\ndiscussion");
-  // assertTFB(tfb, "Important changes; maic things" //
-  // , "NonImportant changes\ndiscussion\nImportant changes\n maic things");
-  // assertTFB(tfb, "Important changes; other things" //
-  // , "Important changes\ndiscussion\nNonImportat changes\nother things");
-  // }
+  @Test
+  public void testConcatDescriptionWithOtherSeparator() {
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null).setSeparator('#');
+
+    assertTFB(tfb, of("Important changes", "discussion") //
+        , "Important changes# discussion");
+    assertTFB(tfb, of("FIXME", "Important changes# discussion", "Importat hanges# maic things") //
+        , "Importat hanges# maic things");
+    assertTFB(tfb,
+        of("FIXME", "Important changes# discussion", "Important changes# maic things", "Importat hanges# maic things") //
+        , "Important changes# maic things");
+  }
+
+  @Test
+  public void testConcatDescriptionNo() {
+
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+
+    assertTFB(tfb, of("NonImportant changes discussion") //
+        , "NonImportant changes discussion");
+  }
+
+  @Test
+  public void testConcatDescriptionSingle() {
+
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+
+    assertTFB(tfb, of("NonImportant changes", "discussion") //
+        , "NonImportant changes ; discussion");
+  }
 
   protected void assertTFB(TicketFilterBuilder tfb, List<String> expected, String comment) {
     DateTime begin = DateTime.now();
     Duration duration = Duration.ZERO;
     Iterable<String> path = ImmutableList.of("001", "abc");
     ITimeSheetPosition pos1 = new TimeSheetPosition(begin, comment, duration, path);
-    assertEquals(expected, tfb.concatDescription(pos1));
+    assertEquals(expected.toString(), tfb.concatDescription(pos1).toString());
   }
 
 }

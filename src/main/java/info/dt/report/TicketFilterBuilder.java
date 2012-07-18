@@ -5,10 +5,12 @@ import info.dt.data.TimeSheetPosition;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
@@ -97,6 +99,20 @@ public class TicketFilterBuilder {
 
   private char separatorChar = ';';
 
+  private Comparator<? super CharPosition> charPosComparator = new Comparator<CharPosition>() {
+
+    public int compare(CharPosition arg0, CharPosition arg1) {
+      return Integer.valueOf(arg0.getPos()).compareTo(Integer.valueOf(arg1.getPos()));
+
+    }
+  };
+
+  @Data
+  private static class CharPosition {
+    private final int pos;
+    private final char character;
+  }
+
   protected List<String> concatDescription(ITimeSheetPosition pos) {
 
     String desc = pos.getComment();
@@ -106,58 +122,74 @@ public class TicketFilterBuilder {
     }
 
     ticketDesc.put(id, desc);
-    StringBuilder title = new StringBuilder();
-    String titleBuff = null;
+
     List<String> lines = Lists.newArrayList(ticketDesc.get(id));
 
+    Multimap<CharPosition, Integer> histogramm = ArrayListMultimap.create();
     for (String line : lines) {
-      if (titleBuff == null) {
-
-        titleBuff = line.trim();
-        if (lines.size() == 1) {
-          title.append(titleBuff);
-        }
-        continue;
+      if (lines.size() == 1 && !line.contains(separatorChar + "")) {
+        return ImmutableList.of(line);
       }
       char[] charArray = line.trim().toCharArray();
-      char[] charArray2 = titleBuff.toCharArray();
-      String newTile = title.toString();
-      boolean notFound = true;
       for (int i = 0; i < charArray.length; i++) {
-        char a;
-        if (i >= charArray2.length) {
-          a = 'δ';
-        } else {
-          a = charArray2[i];
+        histogramm.put(new CharPosition(i, charArray[i]), Integer.valueOf(1));
+      }
+    }
+    Multimap<Integer, CharPosition> sizeGroupMap = ArrayListMultimap.create();
+    for (Entry<CharPosition, Collection<Integer>> entry : histogramm.asMap().entrySet()) {
+      sizeGroupMap.put(entry.getValue().size(), entry.getKey());
+    }
 
+    int length = 0;
+    boolean separatorBreak = false;
+    String title = "";
+    for (Entry<Integer, Collection<CharPosition>> entry : sizeGroupMap.asMap().entrySet()) {
+      List<CharPosition> list = Lists.newArrayList(entry.getValue());
+      Collections.sort(list, charPosComparator);
+      if (list.size() > length) {
+        StringBuilder workTitle = new StringBuilder();
+        int index = 0;
+        length = list.size();
+        for (CharPosition cp : list) {
+          if (cp.getPos() == index) {
+            if (cp.getCharacter() == separatorChar) {
+              separatorBreak = true;
+              break;
+            }
+            workTitle.append(cp.getCharacter());
+          } else {
+            separatorBreak = false;
+            break;
+          }
+          index++;
         }
-        char b = charArray[i];
-        if (a == b && newTile.length() <= i && notFound) {
-          title.append(b);
+        if (separatorBreak) {
+          title = workTitle.toString();
         } else {
-          notFound = false;
+          title = "FIXME";
         }
       }
-
-      titleBuff = line;
     }
+
     String titleString = title.toString();
-    titleString = titleString.replace(separatorChar, '\n').replaceAll("\n.*", "");
+
     List<String> result = Lists.newArrayList();
     result.add(titleString.trim());
-    if (lines.size() > 0) {
-      Collections.sort(lines);
-      for (String line : lines) {
-        String replaceFirst = line.replaceFirst("^" + titleString, "");
-        for (String s : Splitter.on(separatorChar).split(replaceFirst)) {
+    Collections.sort(lines);
+    for (String line : lines) {
+      if (line.startsWith(titleString)) {
+        line = line.substring(titleString.length());
+      }
+      if (separatorBreak) {
+        for (String s : Splitter.on(separatorChar).split(line)) {
           String trim = s.trim();
           if (trim.length() > 0) {
             result.add(trim);
           }
         }
-
+      } else {
+        result.add(line);
       }
-
     }
 
     return result;
