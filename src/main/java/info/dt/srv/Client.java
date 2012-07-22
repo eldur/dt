@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.eclipse.jetty.websocket.WebSocket;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -16,6 +18,7 @@ import org.joda.time.Interval;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
+@Slf4j
 class Client extends Thread implements WebSocket.OnTextMessage {
 
   @Inject
@@ -50,10 +53,15 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   @Override
   public void run() {
     while (!isInterrupted()) {
-      Interval currentInterval = report.getCurrentInterval();
-      DateTime start = currentInterval.getStart();
-      TimeSheet timeSheet = iDateConfig.getTimeSheet(start.getYear(), start.getMonthOfYear());
-      send(serializer.toJson(timeSheet, idsOnClient));
+      try {
+        Interval currentInterval = report.getCurrentInterval();
+        DateTime start = currentInterval.getStart();
+        TimeSheet timeSheet = iDateConfig.getTimeSheet(start.getYear(), start.getMonthOfYear());
+        send(serializer.toJson(timeSheet, idsOnClient));
+      } catch (RuntimeException e) {
+        log.error("", e);
+        // TODO send error; format?
+      }
       try {
         synchronized (this) {
           wait(2000);

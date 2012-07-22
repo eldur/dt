@@ -22,11 +22,13 @@ public class TicketFilterBuilderTest {
 
     assertTFB(tfb, of("Important (.changes)", "discussion"), "Important (.changes); discussion" //
     );
-    assertTFB(tfb, of("Important (.changes)", "discussion", "maic", "things"), "Important (.changes); maic ; things" //
+    assertTFB(tfb, of("Important (.changes)", "discussion", "magic and dangerous but unbelievable", "things") //
+        , "Important (.changes); magic and dangerous but unbelievable ; things" //
     );
     assertTFB(
         tfb,
-        of("FIXME", "Important (.changes); discussion", "Important (.changes); maic ; things",
+        of("FIXME", "Important (.changes); discussion",
+            "Important (.changes); magic and dangerous but unbelievable ; things",
             "Importat hanges; maic things;other things"), "Importat hanges; maic things;other things" //
     );
   }
@@ -48,6 +50,59 @@ public class TicketFilterBuilderTest {
   public void testConcatDescriptionNo() {
 
     TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+
+    assertTFB(tfb, of("NonImportant changes discussion") //
+        , "NonImportant changes discussion");
+  }
+
+  @Test
+  public void testConcatDescriptionLength() {
+
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+    assertTFB(tfb, of("b", "NonImportant changes discussion") //
+        , "b;NonImportant changes discussion");
+
+    assertTFB(tfb, of("b", "NonImportant changes discussion") //
+        , "b;NonImportant changes discussion");
+
+    assertTFB(tfb, of("b", "NonImportant changes discussion") //
+        , "b;NonImportant changes discussion; ");
+  }
+
+  @Test
+  public void testConcatDescriptionOptional() {
+
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+    assertTFB(tfb, of("NonImportant changes discussion") //
+        , "NonImportant changes discussion");
+
+    assertTFB(tfb, of("NonImportant changes discussion", "test") //
+        , "NonImportant changes discussion; test");
+  }
+
+  @Test
+  public void testConcatDescriptionLengthVari() {
+
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+
+    assertTFB(tfb, of("a", "Important changes discussion") //
+        , "a;Important changes discussion");
+
+    assertTFB(tfb, of("a", "Important changes discussion", "Non") //
+        , "a;Important changes discussion;Non");
+
+    assertTFB(tfb, of("a", "Important changes discussion", "Non") //
+        , "a;Important changes discussion;Non");
+
+  }
+
+  @Test
+  public void testConcatDescriptionOnly() {
+
+    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
+
+    assertTFB(tfb, of("NonImportant changes discussion") //
+        , "NonImportant changes discussion");
 
     assertTFB(tfb, of("NonImportant changes discussion") //
         , "NonImportant changes discussion");

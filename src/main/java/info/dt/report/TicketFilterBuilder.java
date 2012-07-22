@@ -28,6 +28,8 @@ import com.google.common.collect.Multimap;
 @Slf4j
 public class TicketFilterBuilder {
 
+  private static final String FIXME = "FIXME";
+
   private final List<IReportPosition> positions = Lists.newArrayList();
 
   private final Iterable<TimeSheetPosition> t;
@@ -125,49 +127,36 @@ public class TicketFilterBuilder {
 
     List<String> lines = Lists.newArrayList(ticketDesc.get(id));
 
-    Multimap<CharPosition, Integer> histogramm = ArrayListMultimap.create();
-    for (String line : lines) {
-      if (lines.size() == 1 && !line.contains(separatorChar + "")) {
-        return ImmutableList.of(line);
-      }
-      char[] charArray = line.trim().toCharArray();
-      for (int i = 0; i < charArray.length; i++) {
-        histogramm.put(new CharPosition(i, charArray[i]), Integer.valueOf(1));
-      }
-    }
-    Multimap<Integer, CharPosition> sizeGroupMap = ArrayListMultimap.create();
-    for (Entry<CharPosition, Collection<Integer>> entry : histogramm.asMap().entrySet()) {
-      sizeGroupMap.put(entry.getValue().size(), entry.getKey());
-    }
+    Multimap<Integer, CharPosition> sizeGroupMap = toCharHistogram(lines);
 
-    int length = 0;
     boolean separatorBreak = false;
-    String title = "";
+    String title = FIXME;
     for (Entry<Integer, Collection<CharPosition>> entry : sizeGroupMap.asMap().entrySet()) {
+
       List<CharPosition> list = Lists.newArrayList(entry.getValue());
       Collections.sort(list, charPosComparator);
-      if (list.size() > length) {
-        StringBuilder workTitle = new StringBuilder();
-        int index = 0;
-        length = list.size();
-        for (CharPosition cp : list) {
-          if (cp.getPos() == index) {
-            if (cp.getCharacter() == separatorChar) {
-              separatorBreak = true;
-              break;
-            }
-            workTitle.append(cp.getCharacter());
-          } else {
-            separatorBreak = false;
+      StringBuilder workTitle = new StringBuilder();
+      int index = 0;
+
+      for (CharPosition cp : list) {
+        if (cp.getPos() == index) {
+          if (cp.getCharacter() == separatorChar) {
+            separatorBreak = true;
             break;
           }
-          index++;
-        }
-        if (separatorBreak) {
-          title = workTitle.toString();
+          workTitle.append(cp.getCharacter());
         } else {
-          title = "FIXME";
+          separatorBreak = false;
+          break;
         }
+        index++;
+      }
+      String workTitleString = workTitle.toString().trim();
+      if (separatorBreak //
+          || lines.size() == 1 //
+          || FIXME.equals(title) && workTitleString.length() > 0 //
+      ) {
+        title = workTitleString;
       }
     }
 
@@ -180,19 +169,34 @@ public class TicketFilterBuilder {
       if (line.startsWith(titleString)) {
         line = line.substring(titleString.length());
       }
-      if (separatorBreak) {
-        for (String s : Splitter.on(separatorChar).split(line)) {
-          String trim = s.trim();
-          if (trim.length() > 0) {
-            result.add(trim);
-          }
-        }
-      } else {
-        result.add(line);
+      for (String s : Splitter.on(separatorChar).split(line)) {
+        addIfNotEmpty(result, s);
       }
     }
 
     return result;
+  }
+
+  private void addIfNotEmpty(List<String> result, String s) {
+    String trim = s.trim();
+    if (trim.length() > 0 && !result.contains(s)) {
+      result.add(trim);
+    }
+  }
+
+  protected Multimap<Integer, CharPosition> toCharHistogram(List<String> lines) {
+    Multimap<CharPosition, Integer> histogramm = ArrayListMultimap.create();
+    for (String line : lines) {
+      char[] charArray = line.trim().toCharArray();
+      for (int i = 0; i < charArray.length; i++) {
+        histogramm.put(new CharPosition(i, charArray[i]), Integer.valueOf(1));
+      }
+    }
+    Multimap<Integer, CharPosition> sizeGroupMap = ArrayListMultimap.create();
+    for (Entry<CharPosition, Collection<Integer>> entry : histogramm.asMap().entrySet()) {
+      sizeGroupMap.put(entry.getValue().size(), entry.getKey());
+    }
+    return sizeGroupMap;
   }
 
   public TicketFilterBuilder setSeparator(char separatorChar) {

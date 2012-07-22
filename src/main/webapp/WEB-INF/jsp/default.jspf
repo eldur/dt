@@ -47,12 +47,17 @@
           this.ws = new WebSocket("ws://${srvSocket}/ws/");
           this.ws.onopen = this.onOpen;
           this.ws.onmessage = this.onMessage;
+          this.ws.onerror = this.onError;
           this.ws.onclose = this.onClose;
         },
         
         onOpen: function(){
           $('#info').text('c');
         },
+        
+        onError: function(){
+            $('#info').text('error');
+          },
         
         send: function(message){
           if (this.ws)
