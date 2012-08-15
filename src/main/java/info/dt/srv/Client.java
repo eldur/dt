@@ -12,8 +12,7 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 import org.eclipse.jetty.websocket.WebSocket;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
+import org.joda.time.ReadableInterval;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
@@ -54,10 +53,10 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   public void run() {
     while (!isInterrupted()) {
       try {
-        Interval currentInterval = report.getCurrentInterval();
-        DateTime start = currentInterval.getStart();
-        TimeSheet timeSheet = iDateConfig.getTimeSheet(start.getYear(), start.getMonthOfYear());
-        send(serializer.toJson(timeSheet, idsOnClient));
+        ReadableInterval currentInterval = report.getCurrentInterval();
+
+        TimeSheet timeSheet = iDateConfig.getTimeSheet(currentInterval);
+        send(serializer.toJson(timeSheet, idsOnClient, currentInterval));
       } catch (RuntimeException e) {
         log.error("", e);
         // TODO send error; format?

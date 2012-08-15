@@ -33,16 +33,6 @@ public class DemoReport implements IReportView {
     return "default";
   }
 
-  public String getNext() {
-    // TODO Auto-generated method stub
-    return "a";
-  }
-
-  public String getPrevious() {
-    // TODO Auto-generated method stub
-    return "b";
-  }
-
   public List<IReportPosition> toReportPositions(TimeSheet timeSheet) {
     List<IReportPosition> filtered = new TicketFilterBuilder(timeSheet).getResult();
 

@@ -4,3 +4,10 @@
 2012-06-02:
 - {t: "1030-1100", l: "001+stock+xy", d: "check stock market"}
 - {t: "11-1200", l: "001+meeting+xy", d: "check stock market; meeting"}
+2012-08-01:
+- {t: "11-12", l: "002+meeting+xy", d: "Do a good job; meeting"}
+- {t: "12-1230", l: "002+work+xy", d: "Do a good job; work with client xy; phonecalls"}
+- {t: "1230-14", l: "002+meeting+xy", d: "Do a good job; meeting 2"}
+- {t: "14-15", l: "003+work+xy", d: "Do Nothing; analysis of reporting tools"}
+- {t: "15-16", l: "003+work+xy", d: "Do Nothing; test of Tool AAA"}
+- {t: "16-17", l: "003+work+xy", d: "Do Nothing; test of Tool BBB"}

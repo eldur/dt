@@ -4,7 +4,7 @@ import info.dt.data.TimeSheet;
 
 import java.util.List;
 
-import org.joda.time.Interval;
+import org.joda.time.ReadableInterval;
 
 public interface IReportView {
 
@@ -14,12 +14,8 @@ public interface IReportView {
 
   String getId();
 
-  String getNext();
-
-  String getPrevious();
-
   List<IReportPosition> toReportPositions(TimeSheet timeSheet);
 
-  Interval getCurrentInterval();
+  ReadableInterval getCurrentInterval();
 
 }

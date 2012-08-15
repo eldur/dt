@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.joda.time.Duration;
+import org.joda.time.ReadableInterval;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
@@ -28,7 +29,7 @@ public class JsonSeri implements IJsonSerializer {
   @Inject
   private IReportView reportView;
 
-  public String toJson(TimeSheet timeSheet, Set<String> idsOnClient) {
+  public String toJson(TimeSheet timeSheet, Set<String> idsOnClient, ReadableInterval currentInterval) {
     List<IReportPosition> positions = reportView.toReportPositions(timeSheet);
 
     Set<String> hashes = Sets.newHashSet();
@@ -123,4 +124,5 @@ public class JsonSeri implements IJsonSerializer {
     }
 
   }
+
 }

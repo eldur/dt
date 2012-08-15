@@ -17,6 +17,7 @@ import javax.inject.Named;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.ReadableInterval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.yaml.snakeyaml.Yaml;
@@ -44,7 +45,8 @@ public class YamlDateConfig implements IDateConfig {
 
   }
 
-  public TimeSheet getTimeSheet(int year, int month) {
+  public TimeSheet getTimeSheet(ReadableInterval interval) {
+    DateTime start = interval.getStart();
     Multimap<String, TimeSheetPosition> positions = ArrayListMultimap.create();
     for (URL url : resources) {
       List<TimeSheetPosition> poss = parseYaml(url);
@@ -55,8 +57,8 @@ public class YamlDateConfig implements IDateConfig {
         positions.put(key, pos);
       }
     }
-    List<TimeSheetPosition> list = Lists.newArrayList(positions.get(year + "-" + month));
-    return new TimeSheet(list, year, month, -1d);
+    List<TimeSheetPosition> list = Lists.newArrayList(positions.get(start.getYear() + "-" + start.getMonthOfYear()));
+    return new TimeSheet(list, start.getYear(), start.getMonthOfYear(), -1d);
   }
 
   private List<TimeSheetPosition> parseYaml(URL url) {

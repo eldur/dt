@@ -1,6 +1,7 @@
 package info.dt.data;
 
+import org.joda.time.ReadableInterval;
 
 public interface IDateConfig {
-  TimeSheet getTimeSheet(int year, int month);
+  TimeSheet getTimeSheet(ReadableInterval interval);
 }

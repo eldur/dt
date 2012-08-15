@@ -84,11 +84,12 @@ public class TicketFilterBuilder {
         description = ImmutableList.of();
       }
 
-      if (entry.getValue().size() != 1) {
+      if (pathes.size() > 1 && entry.getValue().size() != 1) {
         lastPath = ImmutableList.of(entry.getKey());
       }
-      positions.add(new ReportPosition(lastDate, formatList(description.subList(0, 1)), formatList(description.subList(
-          1, description.size())), sum, lastPath, pathes, sumOfReport));
+      positions.add(new ReportPosition(lastDate, formatList(description.subList(0, 1)) //
+          , formatList(description.subList(1, description.size())) //
+          , sum, lastPath, pathes, sumOfReport));
     }
     return positions;
   }
@@ -117,8 +118,8 @@ public class TicketFilterBuilder {
 
   protected List<String> concatDescription(ITimeSheetPosition pos) {
 
-    String desc = pos.getComment();
-    String id = pos.getId();
+    String desc = removeWhitespace(pos.getComment(), separatorChar);
+    String id = removeWhitespace(pos.getId(), separatorChar);
     if (id == null) {
       log.error("key is null ");
     }
@@ -166,6 +167,7 @@ public class TicketFilterBuilder {
     result.add(titleString.trim());
     Collections.sort(lines);
     for (String line : lines) {
+      line = line.trim();
       if (line.startsWith(titleString)) {
         line = line.substring(titleString.length());
       }
@@ -175,6 +177,11 @@ public class TicketFilterBuilder {
     }
 
     return result;
+  }
+
+  private String removeWhitespace(String string, char separator) {
+
+    return string.replaceAll("[\\W]*" + separator + "[\\W]*", "" + separator);
   }
 
   private void addIfNotEmpty(List<String> result, String s) {
