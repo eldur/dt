@@ -22,8 +22,9 @@ class ReportPosition extends TimeSheetPosition implements IReportPosition {
   }
 
   public ReportPosition(DateTime begin, String title, String comment //
-      , Duration duration, List<String> path, Map<List<String>, Duration> pathes, Duration reportDuration) {
-    super(begin, comment, duration, path);
+      , Duration duration, List<String> path, Map<List<String>, Duration> pathes//
+      , Duration reportDuration, Status status) {
+    super(begin, comment, duration, path, status);
     this.title = title;
     this.pathes = pathes;
     this.reportDuration = reportDuration;
@@ -36,4 +37,5 @@ class ReportPosition extends TimeSheetPosition implements IReportPosition {
   public int getDurationPercentage() {
     return (int) (100 * getDuration().getMillis() / reportDuration.getMillis());
   }
+
 }

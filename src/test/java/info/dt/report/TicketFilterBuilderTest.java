@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertEquals;
 import info.dt.data.ITimeSheetPosition;
 import info.dt.data.TimeSheetPosition;
+import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.List;
 
@@ -12,8 +13,11 @@ import org.joda.time.Duration;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class TicketFilterBuilderTest {
+
+  private TicketFilterBuilder tfb = new TicketFilterBuilder(null);
 
   @Test
   public void testConcatDescription() {
@@ -49,8 +53,6 @@ public class TicketFilterBuilderTest {
   @Test
   public void testConcatDescriptionNo() {
 
-    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
-
     assertTFB(tfb, of("NonImportant changes discussion") //
         , "NonImportant changes discussion");
   }
@@ -58,7 +60,6 @@ public class TicketFilterBuilderTest {
   @Test
   public void testConcatDescriptionLength() {
 
-    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
     assertTFB(tfb, of("b", "NonImportant changes discussion") //
         , "b;NonImportant changes discussion");
 
@@ -72,7 +73,6 @@ public class TicketFilterBuilderTest {
   @Test
   public void testConcatDescriptionOptional() {
 
-    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
     assertTFB(tfb, of("NonImportant changes discussion") //
         , "NonImportant changes discussion");
 
@@ -83,23 +83,19 @@ public class TicketFilterBuilderTest {
   @Test
   public void testConcatDescriptionLengthVari() {
 
-    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
-
     assertTFB(tfb, of("a", "Important changes discussion") //
         , "a;Important changes discussion");
 
     assertTFB(tfb, of("a", "Important changes discussion", "Non") //
-        , "a;Important changes discussion;Non");
+        , "a; Important changes discussion; Non");
 
     assertTFB(tfb, of("a", "Important changes discussion", "Non") //
-        , "a;Important changes discussion;Non");
+        , "a ;Important changes discussion;Non ");
 
   }
 
   @Test
   public void testConcatDescriptionOnly() {
-
-    TicketFilterBuilder tfb = new TicketFilterBuilder(null);
 
     assertTFB(tfb, of("NonImportant changes discussion") //
         , "NonImportant changes discussion");
@@ -121,8 +117,25 @@ public class TicketFilterBuilderTest {
     DateTime begin = DateTime.now();
     Duration duration = Duration.ZERO;
     Iterable<String> path = ImmutableList.of("001", "abc");
-    ITimeSheetPosition pos1 = new TimeSheetPosition(begin, comment, duration, path);
+    ITimeSheetPosition pos1 = new TimeSheetPosition(begin, comment, duration, path, Status.NONE);
     assertEquals(expected.toString(), tfb.concatDescription(pos1).toString());
+  }
+
+  @Test
+  public void testGetResult() {
+    DateTime now = DateTime.now();
+    Duration hours = Duration.standardHours(1);
+    TimeSheetPosition p1 = new TimeSheetPosition(now, "a", hours, ImmutableList.<String> of("b", "c"), Status.NONE);
+    tfb = new TicketFilterBuilder(ImmutableList.of(p1));
+    // assertEquals(Lists.newArrayList(p1).toString(),
+    // tfb.getResult().toString());
+
+    TimeSheetPosition p2 = new TimeSheetPosition(now, "a", hours, ImmutableList.<String> of("b", "c"), Status.NONE);
+    TimeSheetPosition p3 = new TimeSheetPosition(now, "a", Duration.standardHours(2)//
+        , ImmutableList.<String> of("b", "c"), Status.NONE);
+
+    tfb = new TicketFilterBuilder(ImmutableList.of(p1, p2));
+    assertEquals(Lists.newArrayList(p3).toString(), tfb.getResult().toString());
   }
 
 }

@@ -11,3 +11,5 @@
 - {t: "14-15", l: "003+work+xy", d: "Do Nothing; analysis of reporting tools"}
 - {t: "15-16", l: "003+work+xy", d: "Do Nothing; test of Tool AAA"}
 - {t: "16-17", l: "003+work+xy", d: "Do Nothing; test of Tool BBB"}
+2012-08-02:
+- {t: "16-17", l: "003+work+xy", d: "Do Nothing; test of Tool BBB TODO"}

@@ -12,7 +12,6 @@
 <link rel="stylesheet" type="text/css" href="/assets/bootstrap/css/bootstrap.css">
 <link rel="stylesheet" type="text/css" href="/assets/bootstrap/css/bootstrap-responsive.css">
 <link rel="stylesheet" type="text/css" href="/assets/main.css">
-<script src="/assets/jquery-1.7.2.min.js"></script>
 
 </head>
 <body>

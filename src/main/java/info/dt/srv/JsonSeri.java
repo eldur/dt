@@ -3,6 +3,7 @@ package info.dt.srv;
 import flexjson.JSONSerializer;
 import flexjson.transformer.MapTransformer;
 import info.dt.data.TimeSheet;
+import info.dt.data.TimeSheetPosition.Status;
 import info.dt.report.IReportPosition;
 import info.dt.report.IReportView;
 
@@ -87,6 +88,11 @@ public class JsonSeri implements IJsonSerializer {
       Map<String, Object> map = Maps.newHashMap();
       map.put("htmlid", hash(timeSheetPosition, timeSheet));
       String id = timeSheetPosition.getId();
+      Status status = timeSheetPosition.getStatus();
+      if (status != Status.NONE) {
+        map.put("status", cssClass(status));
+        map.put("statusName", status.name());
+      }
       map.put("id", id);
       map.put("path", formatPath(timeSheetPosition.getPath(), id));
       map.put("title", timeSheetPosition.getTitle());
@@ -107,6 +113,18 @@ public class JsonSeri implements IJsonSerializer {
       map.put("sub", list);
       super.transform(map);
 
+    }
+
+    private String cssClass(Status status) {
+      switch (status) {
+        case TODO:
+          return "label-warning";
+        case FIXME:
+          return "label-important";
+
+        default:
+          return "";
+      }
     }
 
     public String formatPath(Iterable<String> path, String id) {

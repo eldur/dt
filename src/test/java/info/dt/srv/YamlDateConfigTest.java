@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import info.dt.data.IDateConfig;
 import info.dt.data.TimeSheet;
 import info.dt.data.TimeSheetPosition;
+import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class YamlDateConfigTest {
     DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 
     DateTime begin = DateTime.parse(beginStr, fmt);
-    TimeSheetPosition p1 = new TimeSheetPosition(begin, comment, minutes, Lists.newArrayList(labels));
+    TimeSheetPosition p1 = new TimeSheetPosition(begin, comment, minutes, Lists.newArrayList(labels), Status.NONE);
     return p1;
   }
 }

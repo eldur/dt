@@ -1,5 +1,7 @@
 package info.dt.data;
 
+import info.dt.data.TimeSheetPosition.Status;
+
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -16,5 +18,7 @@ public interface ITimeSheetPosition {
   DateTime getBegin();
 
   String getComment();
+
+  Status getStatus();
 
 }

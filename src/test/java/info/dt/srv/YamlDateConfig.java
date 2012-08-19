@@ -3,6 +3,7 @@ package info.dt.srv;
 import info.dt.data.IDateConfig;
 import info.dt.data.TimeSheet;
 import info.dt.data.TimeSheetPosition;
+import info.dt.data.TimeSheetPosition.Status;
 
 import java.io.IOException;
 import java.net.URL;
@@ -79,10 +80,17 @@ public class YamlDateConfig implements IDateConfig {
             List<String> path = null;
             String description = null;
             Duration duration = null;
+            Status status = Status.NONE;
             for (Entry<String, ?> o : pos.entrySet()) {
               String key = o.getKey();
               if ("d".equals(key)) {
                 description = (String) o.getValue();
+                if (description.contains("TODO")) {
+                  status = Status.TODO;
+                }
+                if (description.contains("FIXME")) {
+                  status = Status.FIXME;
+                }
               } else if ("t".equals(key)) {
                 final String value = (String) o.getValue();
                 String beginStr = value.replaceAll("-[0-9]{1,4}$", "");
@@ -114,7 +122,7 @@ public class YamlDateConfig implements IDateConfig {
             }
             TimeSheetPosition timeSheetPosition;
             if (path != null) {
-              timeSheetPosition = new TimeSheetPosition(begin, description, duration.getStandardMinutes(), path);
+              timeSheetPosition = new TimeSheetPosition(begin, description, duration.getStandardMinutes(), path, status);
             } else {
               throw new IllegalStateException("no label was set");
             }

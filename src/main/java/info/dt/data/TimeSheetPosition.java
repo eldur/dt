@@ -16,19 +16,34 @@ public class TimeSheetPosition implements ITimeSheetPosition {
   private final String comment;
   private final Duration duration;
   private final DateTime begin;
+  private final Status status;
 
-  public TimeSheetPosition(DateTime begin, String label, String comment,
-      long minutes) {
-    this(begin, label, comment, Duration.standardMinutes(minutes));
+  public static enum Status {
+    NONE(0), XXX(1), TODO(2), FIXME(3);
+
+    private Integer prio;
+
+    Status(int prio) {
+      this.prio = Integer.valueOf(prio);
+
+    }
+
+    public boolean greaterThen(Status status) {
+
+      return this.prio.compareTo(status.prio) > 0;
+    }
   }
 
-  public TimeSheetPosition(DateTime begin, String comment, long minutes,
-      Iterable<String> path) {
-    this(begin, comment,  Duration.standardMinutes(minutes), path);
+  public TimeSheetPosition(DateTime begin, String label, String comment, long minutes, Status status) {
+    this(begin, label, comment, Duration.standardMinutes(minutes), status);
   }
-  
-  public TimeSheetPosition(DateTime begin, String comment, Duration duration,
-      Iterable<String> path) {
+
+  public TimeSheetPosition(DateTime begin, String comment, long minutes//
+      , Iterable<String> path, Status status) {
+    this(begin, comment, Duration.standardMinutes(minutes), path, status);
+  }
+
+  public TimeSheetPosition(DateTime begin, String comment, Duration duration, Iterable<String> path, Status status) {
     path.getClass();
     comment.getClass();
     this.path = ImmutableList.copyOf(path);
@@ -38,10 +53,10 @@ public class TimeSheetPosition implements ITimeSheetPosition {
     this.comment = comment;
     this.duration = duration;
     this.begin = begin;
+    this.status = status;
   }
 
-  public TimeSheetPosition(DateTime begin, String id, String comment,
-      Duration duration) {
+  public TimeSheetPosition(DateTime begin, String id, String comment, Duration duration, Status status) {
     id.getClass();
     comment.getClass();
     duration.getClass();
@@ -49,7 +64,9 @@ public class TimeSheetPosition implements ITimeSheetPosition {
     this.comment = comment;
     this.duration = duration;
     this.begin = begin;
+    this.status = status;
   }
+
   /**
    * 
    * @return first path element

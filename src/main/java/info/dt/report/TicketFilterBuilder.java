@@ -2,6 +2,7 @@ package info.dt.report;
 
 import info.dt.data.ITimeSheetPosition;
 import info.dt.data.TimeSheetPosition;
+import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -65,8 +66,14 @@ public class TicketFilterBuilder {
       List<String> description = ImmutableList.of();
       DateTime lastDate = null;
       Map<List<String>, Duration> pathes = Maps.newHashMap();
+      Status status = Status.NONE;
       for (ITimeSheetPosition pos : entry.getValue()) {
         sum = sum.plus(pos.getDuration());
+        Status posStatus = pos.getStatus();
+        if (posStatus.greaterThen(status)) {
+          status = posStatus;
+        }
+
         description = concatDescription(pos);
         List<String> path = pos.getPath();
         lastPath = path;
@@ -89,7 +96,7 @@ public class TicketFilterBuilder {
       }
       positions.add(new ReportPosition(lastDate, formatList(description.subList(0, 1)) //
           , formatList(description.subList(1, description.size())) //
-          , sum, lastPath, pathes, sumOfReport));
+          , sum, lastPath, pathes, sumOfReport, status));
     }
     return positions;
   }
