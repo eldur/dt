@@ -12,12 +12,12 @@
     },
     
     onOpen: function(){
-      $('#info').text('c');
+      $('.brand').css('color', "#08c");
     },
     
     onError: function(){
-        $('#info').text('error');
-      },
+      $('.brand').css('color', "red");
+    },
     
     send: function(message){
       if (this.ws)
@@ -74,7 +74,8 @@
     
     onClose: function(m) {
       this.ws = null;
-      $('#info').text('off');
+      $('.brand').css('color', "");
+      reports.connect(this.name);
     }, 
     
   init: function() {
