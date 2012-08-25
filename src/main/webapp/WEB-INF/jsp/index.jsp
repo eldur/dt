@@ -15,13 +15,12 @@
 
 </head>
 <body>
-<div class="navbar navbar-fixed-top">
+<div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
-    <div class="container">
+    <div class="container-fluid">
       
 <a class="brand" href="#">
-  Δt 
-  <h5>Reporting</h5>
+  Δt Reporting
 </a>
 
 <ul class="nav">
