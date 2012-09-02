@@ -95,7 +95,7 @@ public class TicketFilterBuilder {
         lastPath = ImmutableList.of(entry.getKey());
       }
       positions.add(new ReportPosition(lastDate, formatList(description.subList(0, 1)) //
-          , formatList(description.subList(1, description.size())) //
+          , description.subList(1, description.size()) //
           , sum, lastPath, pathes, sumOfReport, status));
     }
     return positions;

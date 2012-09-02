@@ -18,4 +18,6 @@ public interface IReportPosition extends ITimeSheetPosition {
 
   Status getStatus();
 
+  List<String> getCommentLines();
+
 }

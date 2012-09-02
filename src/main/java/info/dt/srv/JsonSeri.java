@@ -19,7 +19,6 @@ import org.joda.time.ReadableInterval;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -96,12 +95,12 @@ public class JsonSeri implements IJsonSerializer {
       map.put("id", id);
       map.put("path", formatPath(timeSheetPosition.getPath(), id));
       map.put("title", timeSheetPosition.getTitle());
-      map.put("comment", timeSheetPosition.getComment());
+      map.put("comment", timeSheetPosition.getCommentLines());
       map.put("duration", toDuration(timeSheetPosition.getDuration()));
       map.put("durationPercentage", timeSheetPosition.getDurationPercentage());
-      List<Map<String, String>> list = Lists.newArrayList();
+      List<Map<String, Object>> list = Lists.newArrayList();
       for (Entry<List<String>, Duration> entry : timeSheetPosition.getPathes().entrySet()) {
-        Map<String, String> submap = Maps.newHashMap();
+        Map<String, Object> submap = Maps.newHashMap();
         submap.put("htmlid", hash(entry.getKey(), entry.getValue(), timeSheetPosition));
         submap.put("duration", toDuration(entry.getValue()));
         int subPercentage = (int) (100 * entry.getValue().getMillis() / timeSheetPosition.getDuration().getMillis());
@@ -127,14 +126,12 @@ public class JsonSeri implements IJsonSerializer {
       }
     }
 
-    public String formatPath(Iterable<String> path, String id) {
-      String join = Joiner.on("-").join(path);
-      int length = id.length();
-      if (join.length() > length) {
-        return join.substring(length + 1);
-      } else {
-        return "";
-      }
+    public List<String> formatPath(Iterable<String> path, String id) {
+
+      List<String> list = Lists.newArrayList(path);
+      list.remove(id);
+      return list;
+
     }
 
     private String toDuration(Duration value) {

@@ -1,4 +1,19 @@
 
+var formatter = {
+	
+	formatLabel : function(element, path) {
+		
+		path.each( function(index,item ){
+			 element.append(' <span class="label" >'+item+'</span> ');
+		});
+	},
+	formatLine : function(element, path) {
+		path.each( function(index,item ){
+			 element.append(' <li>'+item+'</li> ');
+		});
+	}
+};
+
   var reports = {
 
 	connect: function(name) {
@@ -38,9 +53,9 @@
        			  $(".mainLabel", main).after(' <span class="mainLabel label ' + field.status +'">' + field.statusName + '</span>');
        			  
        		  }
-       		  $(".groupLabelText", main).text(field.path);
+       		  formatter.formatLabel($(".groupLabelText", main), $(field.path));
        		  $(".title", main).text(field.title);
-       		  $(".comment", main).text(field.comment);
+       		  formatter.formatLine($(".comment", main),$(field.comment));
        		  $(".mainDuration", main).text(field.duration);
        		  $(".mainPercentage", main).css('width', field.durationPercentage + '%');
        	  	  var subLabel = $(field.sub);
@@ -54,7 +69,7 @@
           		var sub = $('#subTemplate').clone().attr('id', field.htmlid).addClass("copy");
           		$(".subDuration", sub).text(field.duration);
           		$(".subPercentage", sub).css('width', field.durationPercentage + '%');
-          		$(".subLabel", sub).text(field.path);
+          		formatter.formatLabel($(".subLabel", sub),$(field.path));
           		sub.removeClass("hidden");
           		sub.appendTo('.table');
        			});

@@ -10,6 +10,12 @@
 <link rel="apple-touch-icon" href="/assets/Apple-touch-icon.png" />
 <link rel="shortcut icon" href="/assets/favicon.ico" />
 <link rel="stylesheet" type="text/css" href="/assets/bootstrap/css/bootstrap.css">
+<style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
 <link rel="stylesheet" type="text/css" href="/assets/bootstrap/css/bootstrap-responsive.css">
 <link rel="stylesheet" type="text/css" href="/assets/main.css">
 
@@ -19,35 +25,33 @@
   <div class="navbar-inner">
     <div class="container-fluid">
       
-<a class="brand" href="#">
-  Δt Reporting
-</a>
+			<a class="brand" href="#">
+			  Δt Reporting
+			</a>
 
-<ul class="nav">
-
+			<ul class="nav">
+			
 <c:forEach var="position" items="${allReports}">
-  <li <c:if test="${position == reportID}" > class="active" </c:if>><a href="/?r=${position}&m=${param.m}" >${position}</a></li> 
+			  <li <c:if test="${position == reportID}" > class="active" </c:if>><a href="/?r=${position}&m=${param.m}" >${position}</a></li> 
 </c:forEach>
-
-</ul>
-<ul class="nav">
-   <li><a href="/?r=${reportID}&t=${report.previous}" >prev</a></li>
-   <li><a href="/?r=${reportID}&t=${report.next}" >next</a></li> 
-</ul>
+			
+			</ul>
+			<ul class="nav">
+			   <li><a href="/?r=${reportID}&t=${report.previous}" >prev</a></li>
+			   <li><a href="/?r=${reportID}&t=${report.next}" >next</a></li> 
+			</ul>
     </div>
   </div>
 </div>
-<div class="container" style="margin-top: 6em;">
-<p id="info">${report.info}</p>
-<br />
-<h4></h4>
-<div class="row">
-  <div class="span12">
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="span12">
 <c:import url="${view}.jspf" />
-  </div>
+	  </div>
+	</div>
 </div>
 
-
-</div>
 </body>
 </html>

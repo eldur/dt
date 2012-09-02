@@ -9,28 +9,37 @@
       <th collspan="3">${report.label}</th>
     </tr>
   </thead>
-        <tr style="background-color: #F5F5F5" id="template" class="hidden">
-          <td class="mainRow" width="50%" rowspan="1"><p><span class="mainLabel label">LABEL-0</span></p>
-           <span class="title">Title</span><br />
-           <i><small style="font-size: 10pt;" class="comment">- descriptionline</small></i>
+        <tr id="template" class="hidden dark-row">
+          <td class="mainRow" width="50%" rowspan="1">
+            <div class="pathLabels groupLabelText">
+							<!-- 
+              <span class="label"><em>Σ</em></span>
+             -->
+            </div>
+            <div>
+              <span class="label mainLabel">LABEL-0</span> 
+              <span class="title">Title</span>
+            </div>
+            <i><small><ul class="comment"></ul></small></i>
           </td>
           
-          <td width="30%" class="groupLabelText">Σ</td>
-          <td width="20%" >
-             <div class="progress progress-striped">
-               <div class="bar mainPercentage" style="width: 100%;"></div>
-             </div>
+          <td width="45%" >
+
+            <div class="progress progress-striped">
+             
+              <div class="bar mainPercentage" style="width: 100%;"></div>
+            </div>
+             
           </td>
           <td nowrap="nowrap"><small class="mainDuration"></small></td>
         </tr>
       
         <tr id="subTemplate" class="hidden">
-        <td class="subLabel"></td>
-        <td><div class="progress-gray progress progress-striped progress-inverse">
-  <div class="bar subPercentage" style="width:0%"></div>
-</div></td><td nowrap="nowrap"><small class="subDuration"></small></td>
+        	<td><p class="subLabel"></p>
+        	<div class="progress-gray progress progress-striped progress-inverse">
+  							<div class="bar subPercentage" style="width:0%"></div>
+							</div></td><td nowrap="nowrap"><small class="subDuration"></small></td>
         </tr>
-        <!-- /c:forEach>  -->
 
 </table>
 <script src="/assets/jquery-1.7.2.min.js"></script>
