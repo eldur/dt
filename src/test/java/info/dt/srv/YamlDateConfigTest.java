@@ -33,8 +33,7 @@ public class YamlDateConfigTest {
     int month = 6;
     Interval interval = new Interval(DateTime.parse(year + "-" + month + "-01") //
         , DateTime.parse(year + "-" + month + "-30"));
-    double requiredHours = -1;
-    TimeSheet expected = new TimeSheet(positions, year, month, requiredHours);
+    TimeSheet expected = new TimeSheet(positions, year, month);
     IDateConfig dc = new YamlDateConfig(ImmutableList.of(Resources.getResource("test.yaml")));
     TimeSheet timeSheet = dc.getTimeSheet(interval);
     assertEquals(fmt(expected), fmt(timeSheet));

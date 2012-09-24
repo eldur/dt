@@ -10,12 +10,11 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode
 public class TimeSheet implements Iterable<TimeSheetPosition>, Serializable {
-  private static final long serialVersionUID = 6390487023653001503L;
+  private static final long serialVersionUID = 9187423390878942842L;
 
   private final List<TimeSheetPosition> positions;
   private final int year;
   private final int month;
-  private final double requiredHours;
 
   public Iterator<TimeSheetPosition> iterator() {
     return positions.iterator();

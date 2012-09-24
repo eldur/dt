@@ -51,7 +51,18 @@ public class JsonSeri implements IJsonSerializer {
 
     JSONSerializer seri = new JSONSerializer();
     seri.transform(new Aasf(timeSheet), IReportPosition.class);
-    return seri.deepSerialize(positions);
+    Map<String, Object> result = Maps.newHashMap();
+    result.put("positions", positions);
+    result.put("sum", timeSum(positions));
+    return seri.deepSerialize(result);
+  }
+
+  private String timeSum(List<IReportPosition> positions) {
+    Duration sum = Duration.ZERO;
+    for (IReportPosition position : positions) {
+      sum = sum.plus(position.getDuration());
+    }
+    return newPeriodFormatter().print(sum.toPeriod());
   }
 
   private static PeriodFormatter newPeriodFormatter() {

@@ -59,7 +59,7 @@ public class YamlDateConfig implements IDateConfig {
       }
     }
     List<TimeSheetPosition> list = Lists.newArrayList(positions.get(start.getYear() + "-" + start.getMonthOfYear()));
-    return new TimeSheet(list, start.getYear(), start.getMonthOfYear(), -1d);
+    return new TimeSheet(list, start.getYear(), start.getMonthOfYear());
   }
 
   private List<TimeSheetPosition> parseYaml(URL url) {

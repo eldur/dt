@@ -6,7 +6,7 @@
 <table class="table table-bordered">
  <thead>
     <tr>
-      <th collspan="3">${report.label}</th>
+      <th id="report-title">${report.label}</th>
     </tr>
   </thead>
         <tr id="template" class="hidden dark-row">
@@ -26,8 +26,8 @@
           <td width="45%" >
 
             <div class="progress progress-striped">
-             
               <div class="bar mainPercentage" style="width: 100%;"></div>
+              <div class="bar-needle" style="width: 100%; margin-top: 8px; height: 5px; background-color: #eee; "></div>
             </div>
              
           </td>

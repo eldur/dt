@@ -13,39 +13,59 @@ var formatter = {
 		});
 	}
 };
+(function(){
 
-  var reports = {
+function asWebsocket() {
+		this.onOpen = function(){
+        $('.brand').css('color', "#08c");
+      };
+      
+      this.onError = function(){
+        $('.brand').css('color', "red");
+      };
+  	this.connect = function(name) {
+        this.name = name;
+        var location = document.location.toString().replace('http://','ws://').replace('https://','wss://');
+        this.ws = new WebSocket(socketUrl);
+        this.ws.onopen = this.onOpen;
+        this.ws.onmessage = this.onMessage;
+        this.ws.onerror = this.onError;
+        this.ws.onclose = this.onClose;
+        this.ws.ref = this;
+      };
+      
+      
+      this.send = function(message){
+        if (this.ws)
+          this.ws.send(message);
+      };
+      
+      this.onClose = function(m) {
+          this.ws = null;
+          $('.brand').css('color', "");
+          this.ref.connect(this.name);
+        };
+        
+        this.init = function() {
+        	
+    		if (!window.WebSocket) {
+    			alert("WebSockets are not supported by this browser");
+    		}
+    	};
+      
+}
 
-	connect: function(name) {
-      this.name = name;
-      var location = document.location.toString().replace('http://','ws://').replace('https://','wss://');
-      this.ws = new WebSocket(socketUrl);
-      this.ws.onopen = this.onOpen;
-      this.ws.onmessage = this.onMessage;
-      this.ws.onerror = this.onError;
-      this.ws.onclose = this.onClose;
-    },
-    
-    onOpen: function(){
-      $('.brand').css('color', "#08c");
-    },
-    
-    onError: function(){
-      $('.brand').css('color', "red");
-    },
-    
-    send: function(message){
-      if (this.ws)
-        this.ws.send(message);
-    },
-    
+reports = {
+   
     onMessage: function(m) {
       if (m.data){
     	  $('.table tr.copy').each(function() {
     		  $(this).remove();
     	  } );
-    	  
-    	  $.each($.parseJSON(m.data), function(i, field) {
+    	  result = $.parseJSON(m.data);
+          $('#report-title').text(result.sum);
+    	  $.each(result.positions, function(i, field) {
+    		  
        		  var main = $('#template').clone().attr('id', field.htmlid).addClass("copy");
        		  $(".mainLabel", main).text(field.id);
        		  $(".mainLabel", main).addClass(field.status);
@@ -87,16 +107,7 @@ var formatter = {
       }
     },
     
-    onClose: function(m) {
-      this.ws = null;
-      $('.brand').css('color', "");
-      reports.connect(this.name);
-    }, 
-    
-  init: function() {
-		if (!window.WebSocket) {
-	        alert("WebSockets are not supported by this browser");
-	}
-  }
   };
+asWebsocket.apply(reports);
 		
+})();

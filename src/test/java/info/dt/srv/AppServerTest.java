@@ -6,7 +6,6 @@ import info.dt.report.IReportMapping;
 
 import java.net.InetSocketAddress;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import com.google.inject.AbstractModule;
@@ -26,7 +25,6 @@ public class AppServerTest {
         InetSocketAddress srvSocket = InetSocketAddress.createUnresolved("localhost", 9999);
         srvSocket = new InetSocketAddress(9999);
         bind(InetSocketAddress.class).toInstance(srvSocket);
-        bind(DateTime.class).toInstance(DateTime.parse("2012-06-24"));
         bind(IReportMapping.class).to(DefaultReportMapping.class);
         bind(IDateConfig.class).to(DemoDateConfig.class);
       }
