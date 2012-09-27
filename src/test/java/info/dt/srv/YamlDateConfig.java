@@ -36,6 +36,9 @@ public class YamlDateConfig implements IDateConfig {
   private Iterable<URL> resources;
   private static final DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-M");
 
+  static DateTimeFormatter shortFormat = DateTimeFormat.forPattern("HHmm");
+  static DateTimeFormatter beginFormat = DateTimeFormat.forPattern("yyyy-M-d HH:mm");
+
   public YamlDateConfig(@Nullable @Named("yaml.url") URL resource) {
     this(ImmutableList.of(resource));
   }
@@ -65,8 +68,7 @@ public class YamlDateConfig implements IDateConfig {
   private List<TimeSheetPosition> parseYaml(URL url) {
     List<TimeSheetPosition> result = Lists.newArrayList();
     Yaml y = new Yaml();
-    DateTimeFormatter shortFormat = DateTimeFormat.forPattern("HHmm");
-    DateTimeFormatter beginFormat = DateTimeFormat.forPattern("yyyy-M-d HH:mm");
+
     try {
       Object load = y.load(Resources.toString(url, Charsets.UTF_8));
 
@@ -149,7 +151,7 @@ public class YamlDateConfig implements IDateConfig {
       case 4:
         return timeStr;
       default:
-        throw new IllegalStateException();
+        throw new IllegalStateException(timeStr);
     }
   }
 }
