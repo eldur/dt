@@ -19,6 +19,8 @@ import org.joda.time.Duration;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -109,7 +111,7 @@ public class TicketFilterBuilder {
 
   private char separatorChar = ';';
 
-  private Comparator<? super CharPosition> charPosComparator = new Comparator<CharPosition>() {
+  private static Comparator<? super CharPosition> charPosComparator = new Comparator<CharPosition>() {
 
     public int compare(CharPosition arg0, CharPosition arg1) {
       return Integer.valueOf(arg0.getPos()).compareTo(Integer.valueOf(arg1.getPos()));
@@ -121,69 +123,82 @@ public class TicketFilterBuilder {
   private static class CharPosition {
     private final int pos;
     private final char character;
+
+    public static CharPosition valueOf(int i, char c) {
+
+      return new CharPosition(i, c);
+    }
   }
+
+  private static final Cache<ITimeSheetPosition, List<String>> positionListCache = CacheBuilder.newBuilder()
+      .maximumSize(2000).build();
 
   protected List<String> concatDescription(ITimeSheetPosition pos) {
 
-    String desc = removeWhitespace(pos.getComment(), separatorChar);
-    String id = removeWhitespace(pos.getId(), separatorChar);
-    if (id == null) {
-      log.error("key is null ");
-    }
+    List<String> ifPresent = positionListCache.getIfPresent(pos);
+    if (ifPresent != null) {
+      return ifPresent;
+    } else {
+      String desc = removeWhitespace(pos.getComment(), separatorChar);
+      String id = removeWhitespace(pos.getId(), separatorChar);
+      if (id == null) {
+        log.error("key is null ");
+      }
 
-    ticketDesc.put(id, desc);
+      ticketDesc.put(id, desc);
 
-    List<String> lines = Lists.newArrayList(ticketDesc.get(id));
+      List<String> lines = Lists.newArrayList(ticketDesc.get(id));
 
-    Multimap<Integer, CharPosition> sizeGroupMap = toCharHistogram(lines);
+      Multimap<Integer, CharPosition> sizeGroupMap = toCharHistogram(lines);
 
-    boolean separatorBreak = false;
-    String title = FIXME;
-    for (Entry<Integer, Collection<CharPosition>> entry : sizeGroupMap.asMap().entrySet()) {
+      boolean separatorBreak = false;
+      String title = FIXME;
+      for (Entry<Integer, Collection<CharPosition>> entry : sizeGroupMap.asMap().entrySet()) {
 
-      List<CharPosition> list = Lists.newArrayList(entry.getValue());
-      Collections.sort(list, charPosComparator);
-      StringBuilder workTitle = new StringBuilder();
-      int index = 0;
+        List<CharPosition> list = Lists.newArrayList(entry.getValue());
+        Collections.sort(list, charPosComparator);
+        StringBuilder workTitle = new StringBuilder();
+        int index = 0;
 
-      for (CharPosition cp : list) {
-        if (cp.getPos() == index) {
-          if (cp.getCharacter() == separatorChar) {
-            separatorBreak = true;
+        for (CharPosition cp : list) {
+          if (cp.getPos() == index) {
+            if (cp.getCharacter() == separatorChar) {
+              separatorBreak = true;
+              break;
+            }
+            workTitle.append(cp.getCharacter());
+          } else {
+            separatorBreak = false;
             break;
           }
-          workTitle.append(cp.getCharacter());
-        } else {
-          separatorBreak = false;
-          break;
+          index++;
         }
-        index++;
+        String workTitleString = workTitle.toString().trim();
+        if (separatorBreak //
+            || lines.size() == 1 //
+            || FIXME.equals(title) && workTitleString.length() > 0 //
+        ) {
+          title = workTitleString;
+        }
       }
-      String workTitleString = workTitle.toString().trim();
-      if (separatorBreak //
-          || lines.size() == 1 //
-          || FIXME.equals(title) && workTitleString.length() > 0 //
-      ) {
-        title = workTitleString;
+
+      String titleString = title.toString();
+
+      List<String> result = Lists.newArrayList();
+      result.add(titleString.trim());
+      Collections.sort(lines);
+      for (String line : lines) {
+        line = line.trim();
+        if (line.startsWith(titleString)) {
+          line = line.substring(titleString.length());
+        }
+        for (String s : Splitter.on(separatorChar).split(line)) {
+          addIfNotEmpty(result, s);
+        }
       }
+      positionListCache.put(pos, result);
+      return result;
     }
-
-    String titleString = title.toString();
-
-    List<String> result = Lists.newArrayList();
-    result.add(titleString.trim());
-    Collections.sort(lines);
-    for (String line : lines) {
-      line = line.trim();
-      if (line.startsWith(titleString)) {
-        line = line.substring(titleString.length());
-      }
-      for (String s : Splitter.on(separatorChar).split(line)) {
-        addIfNotEmpty(result, s);
-      }
-    }
-
-    return result;
   }
 
   private String removeWhitespace(String string, char separator) {
@@ -199,16 +214,22 @@ public class TicketFilterBuilder {
   }
 
   protected Multimap<Integer, CharPosition> toCharHistogram(List<String> lines) {
-    Multimap<CharPosition, Integer> histogramm = ArrayListMultimap.create();
+    Map<CharPosition, Integer> histogramm = Maps.newHashMap();
     for (String line : lines) {
       char[] charArray = line.trim().toCharArray();
       for (int i = 0; i < charArray.length; i++) {
-        histogramm.put(new CharPosition(i, charArray[i]), Integer.valueOf(1));
+        CharPosition pos = CharPosition.valueOf(i, charArray[i]);
+        Integer integer = histogramm.get(pos);
+        if (integer == null) {
+          histogramm.put(pos, Integer.valueOf(1));
+        } else {
+          histogramm.put(pos, integer.intValue() + 1);
+        }
       }
     }
     Multimap<Integer, CharPosition> sizeGroupMap = ArrayListMultimap.create();
-    for (Entry<CharPosition, Collection<Integer>> entry : histogramm.asMap().entrySet()) {
-      sizeGroupMap.put(entry.getValue().size(), entry.getKey());
+    for (Entry<CharPosition, Integer> entry : histogramm.entrySet()) {
+      sizeGroupMap.put(entry.getValue(), entry.getKey());
     }
     return sizeGroupMap;
   }

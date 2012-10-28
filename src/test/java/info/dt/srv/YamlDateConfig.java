@@ -5,16 +5,25 @@ import info.dt.data.TimeSheet;
 import info.dt.data.TimeSheetPosition;
 import info.dt.data.TimeSheetPosition.Status;
 
-import java.io.IOException;
+import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -24,46 +33,107 @@ import org.joda.time.format.DateTimeFormatter;
 import org.yaml.snakeyaml.Yaml;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListenableFutureTask;
 
+@Slf4j
+@Singleton
 public class YamlDateConfig implements IDateConfig {
 
   private Iterable<URL> resources;
-  private static final DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-M");
 
   static DateTimeFormatter shortFormat = DateTimeFormat.forPattern("HHmm");
   static DateTimeFormatter beginFormat = DateTimeFormat.forPattern("yyyy-M-d HH:mm");
 
-  public YamlDateConfig(@Nullable @Named("yaml.url") URL resource) {
+  @Inject
+  public YamlDateConfig(@Named("yaml.url") URL resource) {
     this(ImmutableList.of(resource));
   }
 
-  @Inject
-  public YamlDateConfig(@Nullable @Named("yaml.urls") Iterable<URL> resources) {
+  public YamlDateConfig(@Named("yaml.urls") Iterable<URL> resources) {
     this.resources = resources;
-
   }
 
-  public TimeSheet getTimeSheet(ReadableInterval interval) {
-    DateTime start = interval.getStart();
-    Multimap<String, TimeSheetPosition> positions = ArrayListMultimap.create();
-    for (URL url : resources) {
-      List<TimeSheetPosition> poss = parseYaml(url);
-      for (TimeSheetPosition pos : poss) {
-        DateTime begin = pos.getBegin();
-        String key = begin.toString(dateFormat);
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+  private final LoadingCache<ReadableInterval, List<TimeSheetPosition>> cache //
+  = CacheBuilder.newBuilder().refreshAfterWrite(2, TimeUnit.SECONDS)
+      .build(new CacheLoader<ReadableInterval, List<TimeSheetPosition>>() {
 
-        positions.put(key, pos);
-      }
-    }
-    List<TimeSheetPosition> list = Lists.newArrayList(positions.get(start.getYear() + "-" + start.getMonthOfYear()));
-    return new TimeSheet(list, start.getYear(), start.getMonthOfYear());
-  }
+        private Map<String, Long> fileChanged = Maps.newConcurrentMap();
+        private List<URL> toReload = Lists.newArrayList();
+
+        @Override
+        public List<TimeSheetPosition> load(ReadableInterval key) throws Exception {
+          toReload.clear();
+          toReload.addAll(Lists.newArrayList(getAllResourceURLs()));
+          List<TimeSheetPosition> positions = reload();
+          return positions;
+        }
+
+        private List<TimeSheetPosition> reload() {
+          List<TimeSheetPosition> positions = Lists.newArrayList();
+          for (URL url : toReload) {
+            log.info("reload {}", url.toExternalForm());
+            List<TimeSheetPosition> poss = parseYaml(url);
+            for (TimeSheetPosition pos : poss) {
+              positions.add(pos);
+            }
+          }
+          return positions;
+        }
+
+        @Override
+        public ListenableFuture<List<TimeSheetPosition>> reload(final ReadableInterval key,
+            List<TimeSheetPosition> prevGraph) {
+          if (noRefreshNeeded()) {
+            return Futures.immediateFuture(prevGraph);
+          } else {
+            ListenableFutureTask<List<TimeSheetPosition>> task = ListenableFutureTask
+                .create(new Callable<List<TimeSheetPosition>>() {
+                  public List<TimeSheetPosition> call() {
+                    return reload();
+                  }
+                });
+            executor.execute(task);
+            return task;
+          }
+        }
+
+        private Iterable<URL> getAllResourceURLs() {
+          return resources;
+        }
+
+        private boolean noRefreshNeeded() {
+          toReload.clear();
+          boolean refresh = true;
+          for (URL url : getAllResourceURLs()) {
+            try {
+              File file = new File(url.toURI());
+              Long changeDate = fileChanged.get(file.getAbsolutePath());
+              Long valueOf = Long.valueOf(file.lastModified());
+              if (changeDate == null || !valueOf.equals(changeDate)) {
+                log.info("file change detected / {}", file.getName());
+                refresh = false;
+                toReload.add(url);
+              }
+              fileChanged.put(file.getAbsolutePath(), valueOf);
+            } catch (URISyntaxException e) {
+              throw new IllegalArgumentException(e);
+            }
+          }
+          return refresh;
+        }
+      });
 
   private List<TimeSheetPosition> parseYaml(URL url) {
     List<TimeSheetPosition> result = Lists.newArrayList();
@@ -86,7 +156,15 @@ public class YamlDateConfig implements IDateConfig {
             for (Entry<String, ?> o : pos.entrySet()) {
               String key = o.getKey();
               if ("d".equals(key)) {
-                description = (String) o.getValue();
+                Object value = o.getValue();
+                if (value instanceof String) {
+                  description = (String) value;
+                } else if (value instanceof byte[]) {
+                  description = new String((byte[]) value);
+                } else {
+                  throw new IllegalArgumentException(value.getClass().getCanonicalName());
+                }
+
                 if (description.contains("TODO")) {
                   status = Status.TODO;
                 }
@@ -135,7 +213,7 @@ public class YamlDateConfig implements IDateConfig {
         throw new IllegalStateException("data have to be a map");
       }
 
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new IllegalStateException(e);
     }
     return result;
@@ -153,5 +231,27 @@ public class YamlDateConfig implements IDateConfig {
       default:
         throw new IllegalStateException(timeStr);
     }
+  }
+
+  public TimeSheet getTimeSheet(ReadableInterval interval) {
+    DateTime start = interval.getStart();
+    List<TimeSheetPosition> positions = ImmutableList.of();
+    try {
+
+      positions = cache.get(interval);
+
+    } catch (ExecutionException e) {
+      throw new IllegalStateException(e);
+    }
+    Predicate<TimeSheetPosition> predicate = new Predicate<TimeSheetPosition>() {
+
+      public boolean apply(@Nullable TimeSheetPosition input) {
+        // TODO Auto-generated method stub
+        return false;
+      }
+    };
+
+    return new TimeSheet(positions, start.getYear(), start.getMonthOfYear());
+
   }
 }

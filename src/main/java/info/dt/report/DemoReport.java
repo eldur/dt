@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.ReadableInterval;
 
 public class DemoReport implements IReportView {
 
@@ -39,13 +40,12 @@ public class DemoReport implements IReportView {
     return filtered;
   }
 
-  public Interval getCurrentInterval() {
+  public ReadableInterval getCurrentInterval() {
     if (now == null) {
       now = DateTime.now();
     }
 
-    return new Interval(DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-01") //
-        , DateTime.parse(now.getYear() + "-" + now.getMonthOfYear() + "-"
-            + now.dayOfMonth().withMaximumValue().getDayOfMonth()));
+    return (Interval.parse("2012-04-01/2012-09-30"));
   }
+
 }

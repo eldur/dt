@@ -5,13 +5,16 @@ import info.dt.report.DefaultReportMapping;
 import info.dt.report.IReportMapping;
 
 import java.net.InetSocketAddress;
+import java.net.URL;
 
 import org.junit.Test;
 
+import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
 import com.mycila.inject.jsr250.Jsr250;
 
 public class AppServerTest {
@@ -26,7 +29,8 @@ public class AppServerTest {
         srvSocket = new InetSocketAddress(9999);
         bind(InetSocketAddress.class).toInstance(srvSocket);
         bind(IReportMapping.class).to(DefaultReportMapping.class);
-        bind(IDateConfig.class).to(DemoDateConfig.class);
+        bind(IDateConfig.class).to(YamlDateConfig.class);
+        bind(URL.class).annotatedWith(Names.named("yaml.url")).toInstance(Resources.getResource("2012-09-27.yaml"));
       }
 
     };

@@ -36,8 +36,9 @@ function asWebsocket() {
       
       
       this.send = function(message){
-        if (this.ws)
-          this.ws.send(message);
+        if (this.ws) {
+        	this.ws.send(message);
+        }
       };
       
       this.onClose = function(m) {

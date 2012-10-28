@@ -18,7 +18,16 @@ import com.google.common.collect.Lists;
 
 @Singleton
 public class DemoDateConfig implements IDateConfig {
-  DateTime now = DateTime.now();
+
+  private final DateTime now;
+
+  public DemoDateConfig() {
+    DateTime now2 = DateTime.now();
+    long millis = now2.getMillis();
+    long modQuarterHour = millis % 900000;
+    millis = millis - modQuarterHour;
+    now = new DateTime(millis);
+  }
 
   public TimeSheet getTimeSheet(ReadableInterval interval) {
     List<TimeSheetPosition> positions = Lists.newArrayList();

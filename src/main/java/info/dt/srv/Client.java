@@ -35,12 +35,16 @@ class Client extends Thread implements WebSocket.OnTextMessage {
 
   public void onOpen(Connection connection) {
     this.connection = connection;
+    connection.setMaxTextMessageSize(Integer.MAX_VALUE);
     start();
 
   }
 
   protected void send(String string) {
     if (string.length() > 0) {
+      if (string.length() > connection.getMaxTextMessageSize()) {
+        throw new IllegalStateException("Too mutch text");
+      }
       try {
         connection.sendMessage(string);
       } catch (IOException e) {
@@ -63,7 +67,7 @@ class Client extends Thread implements WebSocket.OnTextMessage {
       }
       try {
         synchronized (this) {
-          wait(2000);
+          wait(20000);
         }
       } catch (InterruptedException e) {
         interrupt();
@@ -73,12 +77,17 @@ class Client extends Thread implements WebSocket.OnTextMessage {
 
   public void onClose(int closeCode, String message) {
     connection = null;
+    log.warn("connection closed {}", message);
     interrupt();
   }
 
   public void onMessage(String arg0) {
     Iterable<String> split = Splitter.on(",").split(arg0);
     idsOnClient = Sets.newHashSet(split);
+    synchronized (this) {
+
+      notify();
+    }
 
   }
 

@@ -7,12 +7,15 @@ import info.dt.data.TimeSheetPosition.Status;
 import info.dt.report.IReportPosition;
 import info.dt.report.IReportView;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Inject;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -27,6 +30,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.hash.Hashing;
 
+@Slf4j
 public class JsonSeri implements IJsonSerializer {
 
   @Inject
@@ -104,7 +108,34 @@ public class JsonSeri implements IJsonSerializer {
   private static String hash(Object... objects) {
     StringBuilder sb = new StringBuilder();
     for (Object o : objects) {
-      String string = o.toString();
+      if (log.isDebugEnabled()) {
+        Method[] declaredMethods = o.getClass().getDeclaredMethods();
+        boolean hasHash = false;
+        for (Method method : declaredMethods) {
+          if (method.getName().startsWith("hash")) {
+            hasHash = true;
+
+          }
+        }
+        if (!hasHash) {
+          Method[] methods = o.getClass().getMethods();
+          for (Method method : methods) {
+            if (method.getName().startsWith("hash")) {
+              Class<?> declaringClass = method.getDeclaringClass();
+              if (Object.class.getCanonicalName().equals(declaringClass.getCanonicalName())) {
+                log.warn("{} have to implement hashCode", o.getClass().getCanonicalName());
+                break;
+              }
+            }
+          }
+        }
+      }
+      String string = o.hashCode() + "";
+      if (false && log.isWarnEnabled()) {
+        if (string.contains("@")) {
+          log.warn("@ in " + o.getClass().getCanonicalName() + string);
+        }
+      }
       sb.append(string);
     }
     return Hashing.sha1().hashString(sb.toString()).toString();
