@@ -16,6 +16,8 @@ import javax.inject.Inject;
 
 import org.joda.time.Duration;
 import org.joda.time.ReadableInterval;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
@@ -54,6 +56,9 @@ public class JsonSeri implements IJsonSerializer {
     Map<String, Object> result = Maps.newHashMap();
     result.put("positions", positions);
     result.put("sum", timeSum(positions));
+
+    result.put("start", newDateTimeFormatter().print(currentInterval.getStart()));
+    result.put("end", newDateTimeFormatter().print(currentInterval.getEnd()));
     return seri.deepSerialize(result);
   }
 
@@ -63,6 +68,16 @@ public class JsonSeri implements IJsonSerializer {
       sum = sum.plus(position.getDuration());
     }
     return newPeriodFormatter().print(sum.toPeriod());
+  }
+
+  private static DateTimeFormatter newDateTimeFormatter() {
+    return new DateTimeFormatterBuilder() //
+        .appendYear(4, 4) //
+        .appendLiteral("-")//
+        .appendMonthOfYear(2) //
+        .appendLiteral("-") //
+        .appendDayOfMonth(2) //
+        .toFormatter();
   }
 
   private static PeriodFormatter newPeriodFormatter() {

@@ -64,6 +64,7 @@ reports = {
     	  } );
     	  result = $.parseJSON(m.data);
           $('#report-title').text(result.sum);
+          $('#report-period').text(result.start + " - " + result.end);
     	  $.each(result.positions, function(i, field) {
     		  
        		  var main = $('#template').clone().attr('id', field.htmlid).addClass("copy");
