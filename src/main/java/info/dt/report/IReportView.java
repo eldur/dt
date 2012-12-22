@@ -16,6 +16,10 @@ public interface IReportView {
 
   List<IReportPosition> toReportPositions(TimeSheet timeSheet);
 
+  /**
+   * @deprecated interval controls moved to client
+   */
+  @Deprecated
   ReadableInterval getCurrentInterval();
 
 }

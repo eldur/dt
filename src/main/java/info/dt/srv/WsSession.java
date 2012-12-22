@@ -1,10 +1,13 @@
 package info.dt.srv;
 
+import flexjson.JSONDeserializer;
 import info.dt.data.IDateConfig;
 import info.dt.data.TimeSheet;
 import info.dt.report.IReportView;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -12,13 +15,14 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 import org.eclipse.jetty.websocket.WebSocket;
+import org.joda.time.Interval;
 import org.joda.time.ReadableInterval;
 
-import com.google.common.base.Splitter;
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 @Slf4j
-class Client extends Thread implements WebSocket.OnTextMessage {
+class WsSession extends Thread implements WebSocket.OnTextMessage {
 
   @Inject
   private IJsonSerializer serializer;
@@ -32,6 +36,8 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   private Connection connection = null;
 
   private Set<String> idsOnClient = Sets.newHashSet();
+
+  private ReadableInterval interval = null;
 
   public void onOpen(Connection connection) {
     this.connection = connection;
@@ -57,7 +63,13 @@ class Client extends Thread implements WebSocket.OnTextMessage {
   public void run() {
     while (!isInterrupted()) {
       try {
-        ReadableInterval currentInterval = report.getCurrentInterval();
+        ReadableInterval currentInterval;
+        if (interval != null) {
+          currentInterval = interval;
+        } else {
+
+          currentInterval = report.getCurrentInterval();
+        }
 
         TimeSheet timeSheet = iDateConfig.getTimeSheet(currentInterval);
         send(serializer.toJson(timeSheet, idsOnClient, currentInterval));
@@ -81,14 +93,47 @@ class Client extends Thread implements WebSocket.OnTextMessage {
     interrupt();
   }
 
-  public void onMessage(String arg0) {
-    Iterable<String> split = Splitter.on(",").split(arg0);
-    idsOnClient = Sets.newHashSet(split);
+  public void onMessage(String jsonString) {
+    JSONDeserializer<Map<String, Object>> deserializer = new JSONDeserializer<Map<String, Object>>();
+    Map<String, Object> requestMap = deserializer.deserialize(jsonString);
+
+    maintainIdsOnClient(Optional.fromNullable((List<String>) requestMap
+        .get("ids")));
+
+    String startString = (String) requestMap.get("start");
+    String endString = (String) requestMap.get("end");
+    Optional<String> start = Optional.fromNullable(startString);
+    Optional<String> end = Optional.fromNullable(endString);
+    updateInterval(start, end);
+
     synchronized (this) {
 
       notify();
     }
 
+  }
+
+  private void updateInterval(Optional<String> start, Optional<String> end) {
+    if (start.isPresent() && end.isPresent()) {
+      interval = Interval.parse(start.get() + "/" + end.get() + "T23:59:59"); // XXX
+    }
+  }
+
+  private void maintainIdsOnClient(Optional<List<String>> idsOnClientOpt) {
+
+    if (idsOnClientOpt.isPresent()) {
+      Set<String> possibleIds = Sets.newHashSet(idsOnClientOpt.get());
+      idsOnClient = validateIds(possibleIds);
+    }
+  }
+
+  private Set<String> validateIds(Set<String> possibleIds) {
+    for (String id : possibleIds) {
+      if (id.length() != 40) {
+        throw new IllegalArgumentException(id);
+      }
+    }
+    return possibleIds;
   }
 
 }

@@ -41,7 +41,7 @@ public class WebSocketServlet extends HttpServlet {
       }
 
       public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
-        Client instance = null;
+        WsSession wsSession = null;
         try {
           Class<? extends IReportView> tempReport = reportMapping.get().get(protocol);
           if (tempReport == null) {
@@ -57,13 +57,13 @@ public class WebSocketServlet extends HttpServlet {
               bind(IJsonSerializer.class).to(JsonSeri.class);
             }
           });
-          instance = childInjector.getInstance(Client.class);
+          wsSession = childInjector.getInstance(WsSession.class);
         } catch (RuntimeException e) {
           log.error("", e); // TODO
         }
 
-        instance.getClass();
-        return instance;
+        wsSession.getClass();
+        return wsSession;
 
       }
     });
