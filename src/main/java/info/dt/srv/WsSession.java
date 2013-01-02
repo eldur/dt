@@ -20,6 +20,7 @@ import org.joda.time.Interval;
 import org.joda.time.ReadableInterval;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 @Slf4j
@@ -48,8 +49,8 @@ class WsSession extends Thread implements WebSocket.OnTextMessage {
   }
 
   protected void send(String string) {
-    int textMessageLength = string.length();
-    if (textMessageLength > 0) {
+    if (!Strings.isNullOrEmpty(string)) {
+      int textMessageLength = string.length();
       int maxTextMessageLength = connection.getMaxTextMessageSize();
       if (maxTextMessageLength > 0 && textMessageLength > maxTextMessageLength) {
 
