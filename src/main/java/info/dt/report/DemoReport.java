@@ -13,40 +13,39 @@ import org.joda.time.ReadableInterval;
 
 public class DemoReport implements IReportView {
 
-	/**
-	 * 
-	 * @param parse
-	 *          initial date
-	 */
-	@Inject
-	@Nullable
-	private DateTime now;
+  /**
+   * 
+   * @param parse
+   *          initial date
+   */
+  @Inject
+  @Nullable
+  private DateTime now;
 
-	public String getLabel() {
-		return "Demo Report";
-	}
+  public String getLabel() {
+    return "Demo Report";
+  }
 
-	public String getInfo() {
-		return "info";
-	}
+  public String getInfo() {
+    return "info";
+  }
 
-	public String getId() {
-		return "default";
-	}
+  public String getId() {
+    return "default";
+  }
 
-	public List<IReportPosition> toReportPositions(TimeSheet timeSheet) {
-		List<IReportPosition> filtered = new TicketFilterBuilder(timeSheet)
-				.getResult();
+  public List<IReportPosition> toReportPositions(TimeSheet timeSheet) {
+    List<IReportPosition> filtered = new TicketFilterBuilder(timeSheet).getResult();
 
-		return filtered;
-	}
+    return filtered;
+  }
 
-	public ReadableInterval getCurrentInterval() {
-		if (now == null) {
-			now = DateTime.now();
-		}
+  public ReadableInterval getCurrentInterval() {
+    if (now == null) {
+      now = DateTime.now();
+    }
 
-		return (Interval.parse("2012-12-01/2012-12-31"));
-	}
+    return (Interval.parse("2012-12-01/2012-12-31"));
+  }
 
 }

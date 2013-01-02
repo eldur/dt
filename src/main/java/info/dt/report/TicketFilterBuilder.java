@@ -130,8 +130,8 @@ public class TicketFilterBuilder {
     }
   }
 
-  private static final Cache<ITimeSheetPosition, List<String>> positionListCache = CacheBuilder.newBuilder()
-      .maximumSize(2000).build();
+  private static final Cache<ITimeSheetPosition, List<String>> positionListCache = CacheBuilder
+      .newBuilder().maximumSize(2000).build();
 
   protected List<String> concatDescription(ITimeSheetPosition pos) {
 

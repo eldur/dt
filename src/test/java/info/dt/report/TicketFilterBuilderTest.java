@@ -26,14 +26,16 @@ public class TicketFilterBuilderTest {
 
     assertTFB(tfb, of("Important (.changes)", "discussion"), "Important (.changes); discussion" //
     );
-    assertTFB(tfb, of("Important (.changes)", "discussion", "magic and dangerous but unbelievable", "things") //
+    assertTFB(tfb,
+        of("Important (.changes)", "discussion", "magic and dangerous but unbelievable", "things") //
         , "Important (.changes); magic and dangerous but unbelievable ; things" //
     );
     assertTFB(
         tfb,
         of("FIXME", "Important (.changes); discussion",
             "Important (.changes); magic and dangerous but unbelievable ; things",
-            "Importat hanges; maic things;other things"), "Importat hanges; maic things;other things" //
+            "Importat hanges; maic things;other things"),
+        "Importat hanges; maic things;other things" //
     );
   }
 
@@ -45,8 +47,10 @@ public class TicketFilterBuilderTest {
         , "Important changes# discussion");
     assertTFB(tfb, of("FIXME", "Important changes# discussion", "Importat hanges# maic things") //
         , "Importat hanges# maic things");
-    assertTFB(tfb,
-        of("FIXME", "Important changes# discussion", "Important changes# maic things", "Importat hanges# maic things") //
+    assertTFB(
+        tfb,
+        of("FIXME", "Important changes# discussion", "Important changes# maic things",
+            "Importat hanges# maic things") //
         , "Important changes# maic things");
   }
 
@@ -125,12 +129,14 @@ public class TicketFilterBuilderTest {
   public void testGetResult() {
     DateTime now = DateTime.now();
     Duration hours = Duration.standardHours(1);
-    TimeSheetPosition p1 = new TimeSheetPosition(now, "a", hours, ImmutableList.<String> of("b", "c"), Status.NONE);
+    TimeSheetPosition p1 = new TimeSheetPosition(now, "a", hours, ImmutableList.<String> of("b",
+        "c"), Status.NONE);
     tfb = new TicketFilterBuilder(ImmutableList.of(p1));
     // assertEquals(Lists.newArrayList(p1).toString(),
     // tfb.getResult().toString());
 
-    TimeSheetPosition p2 = new TimeSheetPosition(now, "a", hours, ImmutableList.<String> of("b", "c"), Status.NONE);
+    TimeSheetPosition p2 = new TimeSheetPosition(now, "a", hours, ImmutableList.<String> of("b",
+        "c"), Status.NONE);
     TimeSheetPosition p3 = new TimeSheetPosition(now, "a", Duration.standardHours(2)//
         , ImmutableList.<String> of("b", "c"), Status.NONE);
 

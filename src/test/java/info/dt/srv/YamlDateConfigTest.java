@@ -25,8 +25,10 @@ public class YamlDateConfigTest {
 
     TimeSheetPosition p1 = createPos("2012-06-01 10:30", 45, "phonecall", "Food Dealer 1", "xy");
     TimeSheetPosition p2 = createPos("2012-06-01 11:30", 30, "sell an apple", "Fruit Dealer 2");
-    TimeSheetPosition p3 = createPos("2012-06-02 10:30", 30, "check stock market", "001", "stock", "xy");
-    TimeSheetPosition p4 = createPos("2012-06-02 11:00", 60, "check stock market; meeting", "001", "meeting", "xy");
+    TimeSheetPosition p3 = createPos("2012-06-02 10:30", 30, "check stock market", "001", "stock",
+        "xy");
+    TimeSheetPosition p4 = createPos("2012-06-02 11:00", 60, "check stock market; meeting", "001",
+        "meeting", "xy");
 
     List<TimeSheetPosition> positions = ImmutableList.of(p1, p2, p3, p4);
     int year = 2012;
@@ -44,11 +46,13 @@ public class YamlDateConfigTest {
     return tSheet.toString().replace("(", "\n(");
   }
 
-  private TimeSheetPosition createPos(String beginStr, long minutes, String comment, String... labels) {
+  private TimeSheetPosition createPos(String beginStr, long minutes, String comment,
+      String... labels) {
     DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 
     DateTime begin = DateTime.parse(beginStr, fmt);
-    TimeSheetPosition p1 = new TimeSheetPosition(begin, comment, minutes, Lists.newArrayList(labels), Status.NONE);
+    TimeSheetPosition p1 = new TimeSheetPosition(begin, comment, minutes,
+        Lists.newArrayList(labels), Status.NONE);
     return p1;
   }
 }

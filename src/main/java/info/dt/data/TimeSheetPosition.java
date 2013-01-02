@@ -36,8 +36,7 @@ public class TimeSheetPosition implements ITimeSheetPosition {
     }
   }
 
-  public TimeSheetPosition(DateTime begin, String label, String comment,
-      long minutes, Status status) {
+  public TimeSheetPosition(DateTime begin, String label, String comment, long minutes, Status status) {
     this(begin, label, comment, Duration.standardMinutes(minutes), status);
   }
 
@@ -68,8 +67,8 @@ public class TimeSheetPosition implements ITimeSheetPosition {
     this.status = status;
   }
 
-  public TimeSheetPosition(DateTime begin, String id, String comment,
-      Duration duration, Status status) {
+  public TimeSheetPosition(DateTime begin, String id, String comment, Duration duration,
+      Status status) {
     id.getClass();
     comment.getClass();
     duration.getClass();

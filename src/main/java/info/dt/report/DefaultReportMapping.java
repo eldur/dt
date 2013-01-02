@@ -29,7 +29,8 @@ public class DefaultReportMapping implements IReportMapping {
           if (!clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers())) {
             String reportShortName = getReportShortName(clazz);
             if (reportMapping.get(reportMapping) != null) {
-              throw new IllegalStateException("report name is already registered: " + reportShortName);
+              throw new IllegalStateException("report name is already registered: "
+                  + reportShortName);
             }
             reportMapping.put(reportShortName, clazz);
           }

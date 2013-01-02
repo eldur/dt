@@ -37,8 +37,8 @@ class ContentFiter implements Filter {
     // do nothing
   }
 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-      ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
 
     String report = request.getParameter("r");
     Map<String, Class<? extends IReportView>> reportMapping = this.reportMapping.get();
@@ -64,7 +64,11 @@ class ContentFiter implements Filter {
     request.setAttribute("view", view);
 
     InetSocketAddress socketAddress = injector.getInstance(InetSocketAddress.class);
-    request.setAttribute("srvSocket", socketAddress.getHostName() + ":" + socketAddress.getPort());
+    String hostName = socketAddress.getHostName();
+    if (hostName.startsWith("0.0") || hostName.startsWith("local") || hostName.startsWith("127.")) {
+      log.warn("bad hostname for remote usage: \"{}\"", hostName);
+    }
+    request.setAttribute("srvSocket", hostName + ":" + socketAddress.getPort());
 
     chain.doFilter(request, response);
   }

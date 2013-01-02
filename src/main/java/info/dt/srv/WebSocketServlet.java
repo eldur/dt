@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketFactory;
 
+import com.google.common.collect.Iterables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 
@@ -45,8 +46,7 @@ public class WebSocketServlet extends HttpServlet {
         try {
           Class<? extends IReportView> tempReport = reportMapping.get().get(protocol);
           if (tempReport == null) {
-            // XXX not very nice
-            tempReport = reportMapping.get().entrySet().iterator().next().getValue();
+            tempReport = Iterables.getLast(reportMapping.get().entrySet()).getValue();
           }
           final Class<? extends IReportView> report = tempReport;
           Injector childInjector = injector.createChildInjector(new AbstractModule() {
@@ -59,7 +59,7 @@ public class WebSocketServlet extends HttpServlet {
           });
           wsSession = childInjector.getInstance(WsSession.class);
         } catch (RuntimeException e) {
-          log.error("", e); // TODO
+          log.error("", e);
         }
 
         wsSession.getClass();

@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 import org.eclipse.jetty.websocket.WebSocket;
+import org.joda.time.Duration;
 import org.joda.time.Interval;
 import org.joda.time.ReadableInterval;
 
@@ -47,9 +48,13 @@ class WsSession extends Thread implements WebSocket.OnTextMessage {
   }
 
   protected void send(String string) {
-    if (string.length() > 0) {
-      if (string.length() > connection.getMaxTextMessageSize()) {
-        throw new IllegalStateException("Too mutch text");
+    int textMessageLength = string.length();
+    if (textMessageLength > 0) {
+      int maxTextMessageLength = connection.getMaxTextMessageSize();
+      if (maxTextMessageLength > 0 && textMessageLength > maxTextMessageLength) {
+
+        throw new IllegalStateException("Too mutch text " + textMessageLength + " > "
+            + maxTextMessageLength);
       }
       try {
         connection.sendMessage(string);
@@ -97,8 +102,7 @@ class WsSession extends Thread implements WebSocket.OnTextMessage {
     JSONDeserializer<Map<String, Object>> deserializer = new JSONDeserializer<Map<String, Object>>();
     Map<String, Object> requestMap = deserializer.deserialize(jsonString);
 
-    maintainIdsOnClient(Optional.fromNullable((List<String>) requestMap
-        .get("ids")));
+    maintainIdsOnClient(Optional.fromNullable((List<String>) requestMap.get("ids")));
 
     String startString = (String) requestMap.get("start");
     String endString = (String) requestMap.get("end");
@@ -115,7 +119,31 @@ class WsSession extends Thread implements WebSocket.OnTextMessage {
 
   private void updateInterval(Optional<String> start, Optional<String> end) {
     if (start.isPresent() && end.isPresent()) {
-      interval = Interval.parse(start.get() + "/" + end.get() + "T23:59:59"); // XXX
+      String startString = start.get();
+      String endString = end.get();
+      try {
+        if (interval != null) {
+          Duration duration = interval.toDuration();
+          duration = duration.plus(1000);
+          if ("next".equals(startString) && startString.equals(endString)) {
+            interval = new Interval(interval.getStart().plus(duration) //
+                , interval.getEnd().plus(duration));
+          } else if ("prev".equals(startString) && startString.equals(endString)) {
+            interval = new Interval(interval.getStart().minus(duration) //
+                , interval.getEnd().minus(duration));
+
+          } else {
+            interval = Interval.parse(startString + "T00:00:00/" + endString + "T23:59:59"); // XXX
+          }
+        } else {
+          interval = Interval.parse(startString + "T00:00:00/" + endString + "T23:59:59"); // XXX
+        }
+        idsOnClient.clear();
+        idsOnClient.add("force reload");
+      } catch (Exception e) {
+        log.error("", e);
+      }
+
     }
   }
 

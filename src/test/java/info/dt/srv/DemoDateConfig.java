@@ -50,14 +50,13 @@ public class DemoDateConfig implements IDateConfig {
       }
     };
 
-    return new TimeSheet(Lists.newArrayList(Iterables.filter(positions,
-        predicate)), 0, 0);
+    return new TimeSheet(Lists.newArrayList(Iterables.filter(positions, predicate)), 0, 0);
   }
 
-  private void add(List<TimeSheetPosition> positions, DateTime now,
-      int minutes, String pathStr, String comment) {
+  private void add(List<TimeSheetPosition> positions, DateTime now, int minutes, String pathStr,
+      String comment) {
     Iterable<String> path = Splitter.on(",").split(pathStr);
-    positions.add(new TimeSheetPosition(now, comment, Duration
-        .standardMinutes(minutes), path, Status.NONE));
+    positions.add(new TimeSheetPosition(now, comment, Duration.standardMinutes(minutes), path,
+        Status.NONE));
   }
 }

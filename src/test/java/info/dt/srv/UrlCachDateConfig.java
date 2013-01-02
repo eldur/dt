@@ -54,8 +54,7 @@ public abstract class UrlCachDateConfig implements IDateConfig {
         private final List<URL> toReload = Lists.newArrayList();
 
         @Override
-        public List<TimeSheetPosition> load(ReadableInterval key)
-            throws Exception {
+        public List<TimeSheetPosition> load(ReadableInterval key) throws Exception {
           toReload.clear();
           toReload.addAll(Lists.newArrayList(getAllResourceURLs()));
           List<TimeSheetPosition> positions = innerLoad(key);
@@ -84,8 +83,8 @@ public abstract class UrlCachDateConfig implements IDateConfig {
         }
 
         @Override
-        public ListenableFuture<List<TimeSheetPosition>> reload(
-            final ReadableInterval key, List<TimeSheetPosition> prevGraph) {
+        public ListenableFuture<List<TimeSheetPosition>> reload(final ReadableInterval key,
+            List<TimeSheetPosition> prevGraph) {
           if (noRefreshNeeded()) {
             return Futures.immediateFuture(prevGraph);
           } else {

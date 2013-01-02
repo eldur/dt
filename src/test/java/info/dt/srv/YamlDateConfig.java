@@ -33,8 +33,7 @@ import com.google.common.io.Resources;
 public class YamlDateConfig extends UrlCachDateConfig implements IDateConfig {
 
   static DateTimeFormatter shortFormat = DateTimeFormat.forPattern("HHmm");
-  static DateTimeFormatter beginFormat = DateTimeFormat
-      .forPattern("yyyy-M-d HH:mm");
+  static DateTimeFormatter beginFormat = DateTimeFormat.forPattern("yyyy-M-d HH:mm");
 
   @Inject
   public YamlDateConfig(@Named("yaml.url") URL resource) {
@@ -73,8 +72,7 @@ public class YamlDateConfig extends UrlCachDateConfig implements IDateConfig {
                 } else if (value instanceof byte[]) {
                   description = new String((byte[]) value);
                 } else {
-                  throw new IllegalArgumentException(value.getClass()
-                      .getCanonicalName());
+                  throw new IllegalArgumentException(value.getClass().getCanonicalName());
                 }
 
                 if (description.contains("TODO")) {
@@ -86,18 +84,15 @@ public class YamlDateConfig extends UrlCachDateConfig implements IDateConfig {
               } else if ("t".equals(key)) {
                 final String value = (String) o.getValue();
                 String beginStr = value.replaceAll("-[0-9]{1,4}$", "");
-                DateTime beginHour = DateTime.parse(fillTimeStr(beginStr),
-                    shortFormat);
+                DateTime beginHour = DateTime.parse(fillTimeStr(beginStr), shortFormat);
 
-                String newBegin = day.getYear() + "-" + day.getMonthOfYear()
-                    + "-" + day.getDayOfMonth() + " "
-                    + beginHour.getHourOfDay() + ":"
+                String newBegin = day.getYear() + "-" + day.getMonthOfYear() + "-"
+                    + day.getDayOfMonth() + " " + beginHour.getHourOfDay() + ":"
                     + beginHour.getMinuteOfHour();
                 begin = DateTime.parse(newBegin, beginFormat);
 
                 String endStr = value.replaceAll("^[0-9]{1,4}-", "");
-                DateTime endHour = DateTime.parse(fillTimeStr(endStr),
-                    shortFormat);
+                DateTime endHour = DateTime.parse(fillTimeStr(endStr), shortFormat);
 
                 DateTime diff = endHour.minus(beginHour.getMillis());
 
@@ -106,8 +101,7 @@ public class YamlDateConfig extends UrlCachDateConfig implements IDateConfig {
                 Object value = o.getValue();
                 if (value instanceof String) {
                   String pathString = (String) value;
-                  Iterable<String> iterable = Splitter.on("+")
-                      .split(pathString);
+                  Iterable<String> iterable = Splitter.on("+").split(pathString);
                   path = Lists.newLinkedList(iterable);
                 } else {
                   throw new IllegalStateException("unknown type for l");

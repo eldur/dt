@@ -23,8 +23,7 @@ public class AppServerTest {
 
       @Override
       protected void configure() {
-        InetSocketAddress srvSocket = InetSocketAddress.createUnresolved(
-            "localhost", 9999);
+        InetSocketAddress srvSocket = InetSocketAddress.createUnresolved("localhost", 9999);
         srvSocket = new InetSocketAddress(9999);
         bind(InetSocketAddress.class).toInstance(srvSocket);
         bind(IReportMapping.class).to(DefaultReportMapping.class);

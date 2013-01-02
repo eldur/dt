@@ -1,35 +1,36 @@
 var DT = {};
 
 (function() {
-DT.formatter = {
+  DT.formatter = {
 
-  formatLabel : function(element, path) {
+    formatLabel : function(element, path) {
 
-    path.each(function(index, item) {
-      element.append(' <span class="label" >' + item + '</span> ');
-    });
-  },
-  formatLine : function(element, path) {
-    path.each(function(index, item) {
-      element.append(' <li>' + item + '</li> ');
-    });
-  }
-};
-
-}());
-
-(function() {
+      path.each(function(index, item) {
+        element.append(' <span class="label" >' + item + '</span> ');
+      });
+    },
+    formatLine : function(element, path) {
+      path.each(function(index, item) {
+        element.append(' <li>' + item + '</li> ');
+      });
+    }
+  };
 
   function asWebsocket() {
+
     this.onOpen = function() {
       $('.brand').css('color', "#08c");
+      this.ref.initDatePicker();
     };
 
     this.onError = function() {
       $('.brand').css('color', "red");
     };
-    this.connect = function(name) {
+
+    this.connect = function(socketUrl, name) {
+      this.init();
       this.name = name;
+      this.socketUrl = socketUrl;
       var location = document.location.toString().replace('http://', 'ws://')
           .replace('https://', 'wss://');
       this.ws = new WebSocket(socketUrl);
@@ -38,6 +39,7 @@ DT.formatter = {
       this.ws.onerror = this.onError;
       this.ws.onclose = this.onClose;
       this.ws.ref = this;
+
     };
 
     this.send = function(message) {
@@ -49,7 +51,7 @@ DT.formatter = {
     this.onClose = function(m) {
       this.ws = null;
       $('.brand').css('color', "");
-      this.ref.connect(this.name);
+      this.ref.connect(this.ref.socketUrl, this.ref.name);
     };
 
     this.init = function() {
@@ -61,14 +63,91 @@ DT.formatter = {
 
   }
 
-  reports = {
+  var cookieKeyStart = "start";
+  var cookieKeyEnd = "end";
+  var expires = {
+    expires : 7
+  };
+  var $start = $('#date-start');
+  var $end = $('#date-end');
+
+  DT.reports = {
+
+    sendNewInterval : function(startValue, endValue) {
+      this.send("{\"start\" : \"" + startValue + "\"" + "," + "\"end\" : \""
+          + endValue + "\"" + "}");
+
+    },
+
+    initDatePicker : function() {
+
+      var $dateNext = $('#date-next');
+      var $datePrevious = $('#date-previous');
+
+      $datePrevious.click(function() {
+        DT.reports.sendNewInterval("prev", "prev");
+      });
+
+      $dateNext.click(function() {
+        DT.reports.sendNewInterval("next", "next");
+      });
+
+      var startValue = $.cookie(cookieKeyStart);
+      var endValue = $.cookie(cookieKeyEnd);
+
+      $start //
+      .datepicker() //
+      .on('changeDate', function(ev) {
+        $start.datepicker('hide');
+        DT.reports.updateInterval($start, $end);
+      });
+
+      $end //
+      .datepicker() //
+      .on('changeDate', function(ev) {
+        $end.datepicker('hide');
+        DT.reports.updateInterval($start, $end);
+      });
+
+      this.updateDatePicker($start, startValue, $end, endValue);
+      this.updateInterval($start, $end);
+
+    },
+
+    updateDatePicker : function($start, startValue, $end, endValue) {
+
+      if (startValue) {
+        $start.attr("value", startValue);
+      }
+
+      if (endValue) {
+        $end.attr("value", endValue);
+      }
+      $start.datepicker('update');
+      $end.datepicker('update');
+
+    },
+    updateCookie : function(startValue, endValue) {
+
+      $.cookie(cookieKeyStart, startValue, expires);
+      $.cookie(cookieKeyEnd, endValue, expires);
+    },
+    updateInterval : function($start, $end) {
+      var startValue = $start.attr("value");
+      var endValue = $end.attr("value");
+      this.updateCookie(startValue, endValue);
+      this.sendNewInterval(startValue, endValue);
+
+    },
 
     onMessage : function(m) {
       if (m.data) {
+        result = $.parseJSON(m.data);
+        this.ref.updateDatePicker($start, result.start, $end, result.end);
+        this.ref.updateCookie(result.start, result.end);
         $('.table tr.copy').each(function() {
           $(this).remove();
         });
-        result = $.parseJSON(m.data);
         $('#report-title').text(result.sum);
         $('#report-period').text(
             result.start + " - " + result.end + " " + result.now);
@@ -119,37 +198,9 @@ DT.formatter = {
         });
         this.send("{ \"ids\" : " + JSON.stringify(ids) + "}");
       }
-    },
+    }
 
   };
-  asWebsocket.apply(reports);
+  asWebsocket.apply(DT.reports);
 
-})();
-
-(function(){
-  $(document).ready(function() {
-    var $start = $('#date-start');
-    var $end = $('#date-end');
-    
-     $start //
-    .datepicker() //
-    .on('changeDate', function(ev) {
-      $start.datepicker('hide');
-      changeInterval($start, $end);
-    });
-     
-     $end //
-    .datepicker() //
-    .on('changeDate', function(ev) {
-      $end.datepicker('hide');
-      changeInterval($start, $end);
-    });
-
-  });
-  var changeInterval = function($start, $end) {
-    DT.websocket.send("{\"start\" : \"" + $start.attr("value")
-    + "\""+ "," + "\"end\" : \"" +  $end.attr("value") + "\"" +
-    "}");
-  }
-  
 })();
