@@ -134,10 +134,10 @@ class WsSession extends Thread implements WebSocket.OnTextMessage {
                 , interval.getEnd().minus(duration));
 
           } else {
-            interval = Interval.parse(startString + "T00:00:00/" + endString + "T23:59:59"); // XXX
+            parseInterval(startString, endString);
           }
         } else {
-          interval = Interval.parse(startString + "T00:00:00/" + endString + "T23:59:59"); // XXX
+          parseInterval(startString, endString);
         }
         idsOnClient.clear();
         idsOnClient.add("force reload");
@@ -145,6 +145,15 @@ class WsSession extends Thread implements WebSocket.OnTextMessage {
         log.error("", e);
       }
 
+    }
+  }
+
+  private void parseInterval(String startString, String endString) {
+    try {
+      interval = Interval.parse(startString + "T00:00:00/" + endString + "T23:59:59"); // XXX
+    } catch (IllegalArgumentException e) {
+      log.warn("{}", e.getMessage());
+      interval = Interval.parse(startString + "T00:00:00/" + startString + "T23:59:59");
     }
   }
 
