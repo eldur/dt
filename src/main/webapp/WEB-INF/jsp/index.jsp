@@ -46,7 +46,7 @@
 
 
 <div class="container-fluid">
-	<div class="row">
+	<div class="row-fluid">
 		<div class="span12">
 <c:import url="${view}.jspf" />
 	  </div>
