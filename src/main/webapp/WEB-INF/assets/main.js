@@ -44,7 +44,11 @@ var DT = {};
 
     this.send = function(message) {
       if (this.ws) {
-        this.ws.send(message);
+        try {
+          this.ws.send(message);
+        } catch (e) {
+          alert("ws connection crashed");
+        }
       }
     };
 
@@ -95,17 +99,24 @@ var DT = {};
       var startValue = $.cookie(cookieKeyStart);
       var endValue = $.cookie(cookieKeyEnd);
 
+      var formatDate = function(date) {
+        return date.getFullYear() + "-" +
+          (date.getMonth() + 1) + "-" + date.getDate();
+      };
+      var datepickerConf = {
+        autoclose : true
+      };
       $start //
-      .datepicker() //
+      .datepicker(datepickerConf) //
       .on('changeDate', function(ev) {
-        $start.datepicker('hide');
+        $start.attr('value', formatDate(ev.date));
         DT.reports.updateInterval($start, $end);
       });
 
       $end //
-      .datepicker() //
+      .datepicker(datepickerConf) //
       .on('changeDate', function(ev) {
-        $end.datepicker('hide');
+        $end.attr('value', formatDate(ev.date));
         DT.reports.updateInterval($start, $end);
       });
 
@@ -117,14 +128,12 @@ var DT = {};
     updateDatePicker : function($start, startValue, $end, endValue) {
 
       if (startValue) {
-        $start.attr("value", startValue);
+        $start.datepicker('update', startValue);
       }
 
       if (endValue) {
-        $end.attr("value", endValue);
+        $end.datepicker('update', endValue);
       }
-      $start.datepicker('update');
-      $end.datepicker('update');
 
     },
     updateCookie : function(startValue, endValue) {

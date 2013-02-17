@@ -5,8 +5,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <form class="form-inline">
 <button class="btn btn-small" type="button" id="date-previous"><i class="icon-arrow-left"></i></button>
-<input type="text" value="2012-12-12" id="date-start" data-date-format="yyyy-mm-dd" class="input-small">
-<input type="text" value="2012-12-12" id="date-end" data-date-format="yyyy-mm-dd" class="input-small">
+<input type="text" value="2012-12-12" id="date-start" data-date-format="yyyy-mm-dd" class="input-small" />
+<input type="text" value="2012-12-12" id="date-end" data-date-format="yyyy-mm-dd" class="input-small" />
 <button class="btn btn-small" type="button" id="date-next"><i class="icon-arrow-right"></i></button>
 </form>
 <table class="table table-bordered">
