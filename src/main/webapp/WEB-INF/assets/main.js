@@ -150,7 +150,8 @@ var DT = {};
         });
         $('#report-title').text(result.sum);
         $('#report-period').text(
-            result.start + " - " + result.end + " " + result.now);
+            result.start + " - " + result.end);
+        $('#report-update-info').text(result.now);
         $.each(result.positions, function(i, field) {
 
           var main = $('#template').clone().attr('id', field.htmlid).addClass(

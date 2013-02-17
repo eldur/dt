@@ -28,18 +28,6 @@
 			<a class="brand" href="#">
 			  Δt Reporting
 			</a>
-
-			<ul class="nav">
-			
-<c:forEach var="position" items="${allReports}">
-			  <li <c:if test="${position == reportID}" > class="active" </c:if>><a href="/?r=${position}&m=${param.m}" >${position}</a></li> 
-</c:forEach>
-			
-			</ul>
-			<ul class="nav">
-			   <li><a href="/?r=${reportID}&t=${report.previous}" >prev</a></li>
-			   <li><a href="/?r=${reportID}&t=${report.next}" >next</a></li> 
-			</ul>
     </div>
   </div>
 </div>

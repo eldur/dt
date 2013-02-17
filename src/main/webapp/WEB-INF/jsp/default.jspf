@@ -10,12 +10,15 @@
 <button class="btn btn-small" type="button" id="date-next"><i class="icon-arrow-right"></i></button>
 </form>
 <table class="table table-bordered">
-	<thead>
-		<tr>
-			<th><span id="report-title">${report.label}</span> <span
-				id="report-period"></span></th>
-		</tr>
-	</thead>
+  <thead>
+    <tr>
+      <th colspan="3">
+        <span id="report-title">${report.label}</span> 
+        <span class="report-tr-gray" id="report-period"></span>
+        <span class="report-tr-gray" id="report-update-info"></span>
+      </th>
+    </tr>
+  </thead>
 	<tr id="template" class="hidden dark-row">
 		<td class="mainRow" width="50%" rowspan="1">
 			<div class="pathLabels groupLabelText">
