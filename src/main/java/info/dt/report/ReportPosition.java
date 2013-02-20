@@ -6,9 +6,12 @@ import info.dt.data.TimeSheetPosition;
 import java.util.List;
 import java.util.Map;
 
+import lombok.ToString;
+
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+@ToString
 class ReportPosition extends TimeSheetPosition implements IReportPosition {
 
   private String title;

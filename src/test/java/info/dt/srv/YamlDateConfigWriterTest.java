@@ -20,7 +20,7 @@ public class YamlDateConfigWriterTest {
     ReadableInterval interval = new Interval(now, now.plusDays(2));
     TimeSheet timeSheet = new DemoDateConfig().getTimeSheet(interval);
 
-    YamlDateConfig config = new YamlDateConfig(Resources.getResource("2012-09-27.yaml.yml"));
+    YamlDateConfig config = new YamlDateConfig(Resources.getResource("test.yaml"));
     TimeSheet timeSheet2 = config.getTimeSheet(interval);
     assertTimeSheetEquals(timeSheet, timeSheet2);
 

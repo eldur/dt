@@ -19,8 +19,8 @@ public class DemoReportTest {
     DemoReport dr = getReport(DateTime.parse("2012-06-14"));
     ReadableInterval currentPeriod = dr.getCurrentInterval();
 
-    assertEquals("2012-06-01", formatter().print(currentPeriod.getStart()));
-    assertEquals("2012-06-30", formatter().print(currentPeriod.getEnd()));
+    assertEquals("2012-12-01", formatter().print(currentPeriod.getStart()));
+    assertEquals("2012-12-31", formatter().print(currentPeriod.getEnd()));
 
   }
 
@@ -29,8 +29,8 @@ public class DemoReportTest {
     DemoReport dr = getReport(DateTime.parse("2012-07-1"));
     ReadableInterval currentPeriod = dr.getCurrentInterval();
 
-    assertEquals("2012-07-01", formatter().print(currentPeriod.getStart()));
-    assertEquals("2012-07-31", formatter().print(currentPeriod.getEnd()));
+    assertEquals("2012-12-01", formatter().print(currentPeriod.getStart()));
+    assertEquals("2012-12-31", formatter().print(currentPeriod.getEnd()));
 
   }
 
