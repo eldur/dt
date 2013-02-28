@@ -23,9 +23,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mycila.inject.internal.guava.collect.Maps;
-import com.mycila.inject.internal.guava.io.Files;
+import com.google.common.io.Files;
 
 public class YamlDateConfigWriter {
 

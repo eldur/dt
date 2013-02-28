@@ -2,8 +2,8 @@ package info.dt.srv;
 
 import flexjson.JSONSerializer;
 import flexjson.transformer.MapTransformer;
+import info.dt.data.Status;
 import info.dt.data.TimeSheet;
-import info.dt.data.TimeSheetPosition.Status;
 import info.dt.report.IReportPosition;
 import info.dt.report.IReportView;
 

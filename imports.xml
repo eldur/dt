@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE import-control PUBLIC
+    "-//Puppy Crawl//DTD Import Control 1.1//EN"
+    "http://www.puppycrawl.com/dtds/import_control_1_1.dtd">
+
+<import-control pkg="info.dt">
+
+	<allow pkg="com.google.common" />
+	<allow pkg="java.io" />
+	<allow pkg="java.net" />
+	<allow pkg="java.util" />
+
+	<allow pkg="javax.annotation" />
+	<allow pkg="javax.inject" />
+
+	<allow class="lombok.extern.slf4j.Slf4j" />
+	<allow class="lombok.Data" />
+
+	<allow pkg="org.joda.time" />
+
+	<subpackage name="report">
+		<allow pkg="info.dt.data" />
+	
+		<allow class="java.lang.reflect.Modifier" local-only="true" />
+		<allow class="org.reflections.Reflections" local-only="true" />
+	</subpackage>
+	
+	<subpackage name="srv">
+		<allow pkg="java.math" />
+		<allow pkg="info.dt.data" />
+		<allow pkg="info.dt.report" />
+		<allow pkg="org.eclipse.jetty" />
+		<allow pkg="org.apache.jasper.servlet" />
+		<allow pkg="javax.servlet" />
+		<allow pkg="com.google.inject" />
+		<allow pkg="flexjson" />
+		
+		<!-- for tests -->
+		<allow pkg="org.yaml.snakeyaml" />
+
+		<allow class="java.lang.reflect.Method" local-only="true" />
+	</subpackage>
+
+</import-control>

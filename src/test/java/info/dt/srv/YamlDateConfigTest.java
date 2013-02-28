@@ -2,9 +2,9 @@ package info.dt.srv;
 
 import static org.junit.Assert.assertEquals;
 import info.dt.data.IDateConfig;
+import info.dt.data.Status;
 import info.dt.data.TimeSheet;
 import info.dt.data.TimeSheetPosition;
-import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.List;
 

@@ -3,8 +3,8 @@ package info.dt.report;
 import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertEquals;
 import info.dt.data.ITimeSheetPosition;
+import info.dt.data.Status;
 import info.dt.data.TimeSheetPosition;
-import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.List;
 

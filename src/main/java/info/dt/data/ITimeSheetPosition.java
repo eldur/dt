@@ -1,6 +1,5 @@
 package info.dt.data;
 
-import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.List;
 

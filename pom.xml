@@ -16,6 +16,25 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>check</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<configLocation>checkstyle.xml</configLocation>
+							<logViolationsToConsole>true</logViolationsToConsole>
+							<propertyExpansion>baseDir=${basedir}</propertyExpansion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -108,7 +127,7 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.1</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>

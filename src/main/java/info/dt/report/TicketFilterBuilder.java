@@ -1,8 +1,8 @@
 package info.dt.report;
 
 import info.dt.data.ITimeSheetPosition;
+import info.dt.data.Status;
 import info.dt.data.TimeSheetPosition;
-import info.dt.data.TimeSheetPosition.Status;
 
 import java.util.Collection;
 import java.util.Collections;

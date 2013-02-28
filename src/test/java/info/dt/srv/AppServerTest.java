@@ -6,6 +6,7 @@ import info.dt.report.IReportMapping;
 
 import java.net.InetSocketAddress;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.inject.AbstractModule;
@@ -14,7 +15,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.mycila.inject.jsr250.Jsr250;
 
-//@Ignore
+@Ignore
 public class AppServerTest {
 
   @Test

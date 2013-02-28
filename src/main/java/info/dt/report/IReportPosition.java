@@ -1,7 +1,7 @@
 package info.dt.report;
 
 import info.dt.data.ITimeSheetPosition;
-import info.dt.data.TimeSheetPosition.Status;
+import info.dt.data.Status;
 
 import java.util.List;
 import java.util.Map;

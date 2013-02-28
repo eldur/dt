@@ -15,6 +15,7 @@ public class DemoReport implements IReportView {
 
   /**
    * 
+   * 
    * @param parse
    *          initial date
    */

@@ -1,5 +1,6 @@
 package info.dt.report;
 
+import info.dt.data.Status;
 import info.dt.data.TimeSheetPosition;
 
 import java.util.List;
